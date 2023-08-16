@@ -1,4 +1,4 @@
-import { AuthRepository, SignupFailure, SignupSuccess, signup } from "../../src/service/auth";
+import { AuthRepository, signup } from "../../src/service/auth";
 
 let repo: AuthRepository;
 
@@ -13,7 +13,7 @@ describe("sign up", () => {
 
         const result = await signup(account, password, repo);
 
-        expect(result).toBeInstanceOf(SignupSuccess);
+        expect(result).toBeTruthy();
     });
 
     it("fail if has same account.", async () => {
@@ -21,10 +21,9 @@ describe("sign up", () => {
         const password: string = "test";
 
         await signup(account, password, repo);
-
         const result = await signup(account, password, repo);
 
-        expect(result).toBeInstanceOf(SignupFailure);
+        expect(result).toBeFalsy();
     });
 });
 
