@@ -1,6 +1,11 @@
+import bcrypt from "bcrypt";
+
 export const signup = async (account: string, password: string, repo: AuthRepository)
     : Promise<SignupSuccess | SignupFailure> => {
-    const result = await repo.addUser(account, password);
+
+    const cipher = await bcrypt.hash(password, 10);
+    const result = await repo.addUser(account, cipher);
+
     return result ? new SignupSuccess() : new SignupFailure();
 };
 
