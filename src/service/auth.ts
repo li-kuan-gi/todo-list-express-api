@@ -5,11 +5,11 @@ export const signup = async (account: string, password: string, repo: AuthReposi
     const cipher = await bcrypt.hash(password, 10);
     const result = await repo.addUser(account, cipher);
 
-    return !!result;
+    return result;
 };
 
 export interface AuthRepository {
-    addUser(account: string, password: string): Promise<string | undefined>;
+    addUser(account: string, password: string): Promise<boolean>;
 }
 
 export const validate = async (account: string, password: string, getInfos: GetAccountInfos): Promise<boolean> => {

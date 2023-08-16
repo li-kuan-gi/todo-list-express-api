@@ -69,12 +69,12 @@ class TestAuthRepository implements AuthRepository {
         this.infos = [];
     }
 
-    async addUser(account: string, password: string): Promise<string | undefined> {
+    async addUser(account: string, password: string): Promise<boolean> {
         if (this.infos.find(info => info.account === account)) {
-            return;
+            return false;
         } else {
             this.infos.push({ account, password });
-            return account;
+            return true;
         }
     }
 
