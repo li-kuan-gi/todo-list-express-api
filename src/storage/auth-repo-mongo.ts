@@ -1,5 +1,6 @@
 import { Db, MongoServerError } from "mongodb";
 import { AuthRepository } from "../service/auth";
+import { config } from "../config";
 
 export class AuthRepoMongo implements AuthRepository {
     private readonly db: Db;
@@ -10,7 +11,7 @@ export class AuthRepoMongo implements AuthRepository {
 
     async addUser(account: string, password: string): Promise<boolean> {
         try {
-            await this.db.collection("user").insertOne({ account, password });
+            await this.db.collection(config.userCollName).insertOne({ account, password });
             return true;
         } catch (e) {
             if (e instanceof MongoServerError && e.message.includes("duplicate")) {
