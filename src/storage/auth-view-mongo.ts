@@ -10,7 +10,10 @@ export class AuthViewMongo implements AuthView {
     }
 
     async getPassword(account: string): Promise<string | undefined> {
-        const user = await this.db.collection(config.userCollName).findOne({ account });
+        const user = await this.db.collection(config.userCollName).findOne(
+            { account },
+            { projection: { _id: 0, password: 1 } }
+        );
 
         if (!user) {
             return undefined;
