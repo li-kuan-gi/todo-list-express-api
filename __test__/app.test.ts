@@ -69,12 +69,79 @@ describe("signup api", () => {
     });
 });
 
+describe("login api", () => {
+    it("success if account and password are correct", async () => {
+        const account = "test-account";
+        const password = "test-password";
+        await postSignup(account, password);
+
+        const result = await postLogin(account, password);
+
+        expect(result.status).toBe(200);
+        expect(typeof (await result.json()).token).toBe("string");
+    });
+
+    it("fail if no such account.", async () => {
+        const account = "test-account";
+        const password = "test-password";
+
+        const result = await postLogin(account, password);
+
+        expect(result.status).toBe(401);
+        expect((await result.json()).msg).toContain("incorrect");
+    });
+
+    it("fail if password is wrong.", async () => {
+        const account = "test-account";
+        const password = "test-password";
+        const wrongPassword = "wrong-password";
+        await postSignup(account, password);
+
+        const result = await postLogin(account, wrongPassword);
+
+        expect(result.status).toBe(401);
+        expect((await result.json()).msg).toContain("incorrect");
+    });
+
+    it("fail if account is absent.", async () => {
+        const password = "test";
+
+        const result = await postLogin(undefined, password);
+
+        expect(result.status).toBe(400);
+        expect((await result.json()).msg).toContain("format");
+    });
+
+    it("fail if password is absent.", async () => {
+        const account = "test";
+
+        const result = await postLogin(account, undefined);
+
+        expect(result.status).toBe(400);
+        expect((await result.json()).msg).toContain("format");
+    });
+});
+
 function postSignup(account: string | undefined, password: string | undefined): Promise<Response> {
     const payload: { [k: string]: any; } = {};
     if (account !== undefined) payload["account"] = account;
     if (password !== undefined) payload["password"] = password;
 
     return fetch(`http://localhost:${config.apiPort}/signup`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
+}
+
+function postLogin(account: string | undefined, password: string | undefined): Promise<Response> {
+    const payload: { [k: string]: any; } = {};
+    if (account !== undefined) payload["account"] = account;
+    if (password !== undefined) payload["password"] = password;
+
+    return fetch(`http://localhost:${config.apiPort}/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
