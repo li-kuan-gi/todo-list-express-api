@@ -34,7 +34,7 @@ describe("signup api", () => {
         const account = "test";
         const password = "test";
 
-        const result = await singupPost(account, password);
+        const result = await postSignup(account, password);
 
         expect(result.status).toBe(200);
     });
@@ -43,20 +43,42 @@ describe("signup api", () => {
         const account = "test";
         const password = "test";
 
-        await singupPost(account, password);
-        const result = await singupPost(account, password);
+        await postSignup(account, password);
+        const result = await postSignup(account, password);
 
         expect(result.status).toBe(409);
         expect((await result.json()).msg).toContain("exist");
     });
+
+    it("fail if account is absent.", async () => {
+        const password = "test";
+
+        const result = await postSignup(undefined, password);
+
+        expect(result.status).toBe(400);
+        expect((await result.json()).msg).toContain("format");
+    });
+
+    it("fail if password is absent.", async () => {
+        const account = "test";
+
+        const result = await postSignup(account, undefined);
+
+        expect(result.status).toBe(400);
+        expect((await result.json()).msg).toContain("format");
+    });
 });
 
-function singupPost(account: string, password: string): Promise<Response> {
+function postSignup(account: string | undefined, password: string | undefined): Promise<Response> {
+    const payload: { [k: string]: any; } = {};
+    if (account !== undefined) payload["account"] = account;
+    if (password !== undefined) payload["password"] = password;
+
     return fetch(`http://localhost:${config.apiPort}/signup`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ account, password })
+        body: JSON.stringify(payload)
     });
 }
