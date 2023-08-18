@@ -76,9 +76,10 @@ describe("login api", () => {
         await postSignup(account, password);
 
         const result = await postLogin(account, password);
+        const payload = parseJWT((await result.json()).token);
 
         expect(result.status).toBe(200);
-        expect(typeof (await result.json()).token).toBe("string");
+        expect(payload.account).toBe(account);
     });
 
     it("fail if no such account.", async () => {
@@ -148,4 +149,8 @@ function postLogin(account: string | undefined, password: string | undefined): P
         },
         body: JSON.stringify(payload)
     });
+}
+
+function parseJWT(token: string) {
+    return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
 }
