@@ -1,4 +1,4 @@
-import { AuthRepository, GetAccountInfos, signup, validate } from "../../src/service/auth";
+import { AuthRepository, GetPasswordByAccount, signup, validate } from "../../src/service/auth";
 
 let repo: TestAuthRepository;
 
@@ -31,10 +31,10 @@ describe("validate", () => {
     it("success if account exists and password is correct.", async () => {
         const account: string = "test";
         const password: string = "test";
-        const getInfo: GetAccountInfos = async () => await repo.getAccountInfo();
+        const getPassword: GetPasswordByAccount = async (account: string) => await repo.getPasswordByAccount(account);
         await signup(account, password, repo);
 
-        const result = await validate(account, password, getInfo);
+        const result = await validate(account, password, getPassword);
 
         expect(result).toBeTruthy();
     });
@@ -42,9 +42,9 @@ describe("validate", () => {
     it("fail if no account.", async () => {
         const account: string = "test";
         const password: string = "test";
-        const getInfo: GetAccountInfos = async () => await repo.getAccountInfo();
+        const getPassword: GetPasswordByAccount = async (account: string) => await repo.getPasswordByAccount(account);
 
-        const result = await validate(account, password, getInfo);
+        const result = await validate(account, password, getPassword);
 
         expect(result).toBeFalsy();
     });
@@ -53,10 +53,10 @@ describe("validate", () => {
         const account: string = "test";
         const password: string = "test";
         const wrongPassword = "wrong";
-        const getInfo: GetAccountInfos = async () => await repo.getAccountInfo();
+        const getPassword: GetPasswordByAccount = async (account: string) => await repo.getPasswordByAccount(account);
         await signup(account, password, repo);
 
-        const result = await validate(account, wrongPassword, getInfo);
+        const result = await validate(account, wrongPassword, getPassword);
 
         expect(result).toBeFalsy();
     });
@@ -78,7 +78,8 @@ class TestAuthRepository implements AuthRepository {
         }
     }
 
-    async getAccountInfo() {
-        return this.infos;
+    async getPasswordByAccount(account: string): Promise<string | undefined> {
+        const info = this.infos.find(info => info.account === account);
+        return info ? info.password : undefined;
     }
 }

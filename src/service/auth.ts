@@ -12,13 +12,14 @@ export interface AuthRepository {
     addUser(account: string, password: string): Promise<boolean>;
 }
 
-export const validate = async (account: string, password: string, getInfos: GetAccountInfos): Promise<boolean> => {
-    const infos = await getInfos();
-    const info = infos.find(info => info.account === account);
-    if (!info) {
+export const validate = async (account: string, password: string, getPassword: GetPasswordByAccount): Promise<boolean> => {
+    const cipher = await getPassword(account);
+
+    if (!cipher) {
         return false;
+    } else {
+        return await bcrypt.compare(password, cipher);
     }
-    return await bcrypt.compare(password, info.password);
 };
 
-export type GetAccountInfos = () => Promise<{ account: string, password: string; }[]>;
+export type GetPasswordByAccount = (account: string) => Promise<string | undefined>;
