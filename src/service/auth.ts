@@ -12,8 +12,8 @@ export interface AuthRepository {
     addUser(account: string, password: string): Promise<boolean>;
 }
 
-export const validate = async (account: string, password: string, getPassword: GetPasswordByAccount): Promise<boolean> => {
-    const cipher = await getPassword(account);
+export const validate = async (account: string, password: string, view: AuthView): Promise<boolean> => {
+    const cipher = await view.getPassword(account);
 
     if (!cipher) {
         return false;
@@ -22,4 +22,6 @@ export const validate = async (account: string, password: string, getPassword: G
     }
 };
 
-export type GetPasswordByAccount = (account: string) => Promise<string | undefined>;
+export interface AuthView {
+    getPassword: (account: string) => Promise<string | undefined>;
+}

@@ -1,9 +1,9 @@
-import { AuthRepository, GetPasswordByAccount, signup, validate } from "../../src/service/auth";
+import { AuthRepository, AuthView, signup, validate } from "../../src/service/auth";
 
-let repo: TestAuthRepository;
+let storage: TestAuthStorage;
 
 beforeEach(() => {
-    repo = new TestAuthRepository();
+    storage = new TestAuthStorage();
 });
 
 describe("sign up", () => {
@@ -11,7 +11,7 @@ describe("sign up", () => {
         const account: string = "test";
         const password: string = "test";
 
-        const result = await signup(account, password, repo);
+        const result = await signup(account, password, storage);
 
         expect(result).toBeTruthy();
     });
@@ -20,8 +20,8 @@ describe("sign up", () => {
         const account: string = "test";
         const password: string = "test";
 
-        await signup(account, password, repo);
-        const result = await signup(account, password, repo);
+        await signup(account, password, storage);
+        const result = await signup(account, password, storage);
 
         expect(result).toBeFalsy();
     });
@@ -31,10 +31,9 @@ describe("validate", () => {
     it("success if account exists and password is correct.", async () => {
         const account: string = "test";
         const password: string = "test";
-        const getPassword: GetPasswordByAccount = async (account: string) => await repo.getPasswordByAccount(account);
-        await signup(account, password, repo);
+        await signup(account, password, storage);
 
-        const result = await validate(account, password, getPassword);
+        const result = await validate(account, password, storage);
 
         expect(result).toBeTruthy();
     });
@@ -42,9 +41,8 @@ describe("validate", () => {
     it("fail if no account.", async () => {
         const account: string = "test";
         const password: string = "test";
-        const getPassword: GetPasswordByAccount = async (account: string) => await repo.getPasswordByAccount(account);
 
-        const result = await validate(account, password, getPassword);
+        const result = await validate(account, password, storage);
 
         expect(result).toBeFalsy();
     });
@@ -53,16 +51,15 @@ describe("validate", () => {
         const account: string = "test";
         const password: string = "test";
         const wrongPassword = "wrong";
-        const getPassword: GetPasswordByAccount = async (account: string) => await repo.getPasswordByAccount(account);
-        await signup(account, password, repo);
+        await signup(account, password, storage);
 
-        const result = await validate(account, wrongPassword, getPassword);
+        const result = await validate(account, wrongPassword, storage);
 
         expect(result).toBeFalsy();
     });
 });
 
-class TestAuthRepository implements AuthRepository {
+class TestAuthStorage implements AuthRepository, AuthView {
     private readonly infos: { account: string, password: string; }[];
 
     constructor() {
@@ -78,7 +75,7 @@ class TestAuthRepository implements AuthRepository {
         }
     }
 
-    async getPasswordByAccount(account: string): Promise<string | undefined> {
+    async getPassword(account: string): Promise<string | undefined> {
         const info = this.infos.find(info => info.account === account);
         return info ? info.password : undefined;
     }
