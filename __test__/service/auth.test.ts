@@ -1,26 +1,28 @@
 import { AuthRepository, AuthView, signup, validate } from "../../src/service/auth";
 
+let account: string;
+let password: string;
 let storage: TestAuthStorage;
 
 beforeEach(() => {
+    account = "test account";
+    password = "test password";
     storage = new TestAuthStorage();
 });
 
 describe("sign up", () => {
     it("success if no duplication.", async () => {
-        const account: string = "test";
-        const password: string = "test";
+        const repo: AuthRepository = storage;
 
-        const result = await signup(account, password, storage);
+        const result = await signup(account, password, repo);
 
         expect(result).toBeTruthy();
     });
 
     it("fail if has same account.", async () => {
-        const account: string = "test";
-        const password: string = "test";
+        const repo: AuthRepository = storage;
 
-        await signup(account, password, storage);
+        await signup(account, password, repo);
         const result = await signup(account, password, storage);
 
         expect(result).toBeFalsy();
@@ -29,31 +31,30 @@ describe("sign up", () => {
 
 describe("validate", () => {
     it("success if account exists and password is correct.", async () => {
-        const account: string = "test";
-        const password: string = "test";
-        await signup(account, password, storage);
+        const repo: AuthRepository = storage;
+        await signup(account, password, repo);
+        const view: AuthView = storage;
 
-        const result = await validate(account, password, storage);
+        const result = await validate(account, password, view);
 
         expect(result).toBeTruthy();
     });
 
     it("fail if no account.", async () => {
-        const account: string = "test";
-        const password: string = "test";
+        const view: AuthView = storage;
 
-        const result = await validate(account, password, storage);
+        const result = await validate(account, password, view);
 
         expect(result).toBeFalsy();
     });
 
     it("fail if password is wrong.", async () => {
-        const account: string = "test";
-        const password: string = "test";
+        const repo: AuthRepository = storage;
+        await signup(account, password, repo);
         const wrongPassword = "wrong";
-        await signup(account, password, storage);
+        const view: AuthView = storage;
 
-        const result = await validate(account, wrongPassword, storage);
+        const result = await validate(account, wrongPassword, view);
 
         expect(result).toBeFalsy();
     });
