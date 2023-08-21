@@ -22,7 +22,7 @@ export async function addTask(
 }
 
 export async function removeTask(account: string, project: string, goal: string, repo: TaskRepository) {
-    const task = new Task(account, project, goal, 0);
+    const task = new Task(account, project, goal, 1);
 
     return await repo.remove(task);
 }
@@ -37,7 +37,7 @@ export async function setExpectTime(
     if (time <= 0) {
         return SetExpectTimeResult.InvalidPeriod;
     } else {
-        const task = new Task(account, project, goal, 0);
+        const task = new Task(account, project, goal, 1);
         const result = await repo.updateExpectTime(task, time);
 
         if (!result) {
