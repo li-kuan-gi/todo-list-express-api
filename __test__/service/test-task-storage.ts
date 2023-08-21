@@ -1,16 +1,17 @@
-import { Task, TaskRepository } from "../../src/service/task";
+import { Task } from "../../src/entity/task";
+import { TaskRepository } from "../../src/service/task";
 
 export class TestTaskStorage implements TaskRepository {
     private readonly tasks: Task[] = [];
 
-    async add(account: string, project: string, goal: string, expectTime: number): Promise<boolean> {
-        const task = this.tasks.find(task => task.account === account && task.project === project && task.goal === goal);
+    async add(task: Task): Promise<boolean> {
+        const result = this.tasks.find(t => t.isTheSameAs(task));
 
-        if (!task) {
-            this.tasks.push(new Task(account, project, goal, expectTime));
+        if (!result) {
+            this.tasks.push(task);
         }
 
-        return !task;
+        return !result;
     }
 
     async remove(task: Task): Promise<boolean> {

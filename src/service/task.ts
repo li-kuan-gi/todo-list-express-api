@@ -1,3 +1,5 @@
+import { Task } from "../entity/task";
+
 /**
  * 
  * @param account 
@@ -14,7 +16,9 @@ export async function addTask(
     expectTime: number,
     repo: TaskRepository
 ): Promise<boolean> {
-    return await repo.add(account, project, goal, expectTime);
+    const task = new Task(account, project, goal, expectTime);
+
+    return await repo.add(task);
 }
 
 export async function removeTask(account: string, project: string, goal: string, repo: TaskRepository) {
@@ -24,24 +28,7 @@ export async function removeTask(account: string, project: string, goal: string,
 }
 
 export interface TaskRepository {
-    add(account: string, project: string, goal: string, expectTime: number): Promise<boolean>;
+    // add(account: string, project: string, goal: string, expectTime: number): Promise<boolean>;
+    add(task: Task): Promise<boolean>;
     remove(task: Task): Promise<boolean>;
-}
-
-export class Task {
-    account: string;
-    project: string;
-    goal: string;
-    expectTime: number;
-
-    constructor(account: string, project: string, goal: string, expectTime: number) {
-        this.account = account;
-        this.project = project;
-        this.goal = goal;
-        this.expectTime = expectTime;
-    }
-
-    isTheSameAs(task: Task): boolean {
-        return this.account === task.account && this.project === task.project && this.goal === task.goal;
-    }
 }
