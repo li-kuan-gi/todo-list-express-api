@@ -67,12 +67,27 @@ export async function startTask(
     }
 };
 
+export async function stopTask(
+    account: string,
+    project: string,
+    goal: string,
+    time: Date,
+    repo: TaskRepository
+): Promise<StopTaskResult> {
+    const task = await repo.getTask(account, project, goal);
+
+    const result = task.stop(time);
+
+    return result ? StopTaskResult.Success : StopTaskResult.NotInRunning;
+}
+
 export interface TaskRepository {
     getTask(account: string, project: string, goal: string): Promise<Task>;
     add(task: Task): Promise<boolean>;
     remove(task: Task): Promise<void>;
     updateExpectTime(task: Task, time: number): Promise<void>;
     setStartTime(task: Task, time: Date): Promise<void>;
+    addStopTime(task: Task, time: Date): Promise<void>;
 }
 
 export class TaskNotFound { }
@@ -87,4 +102,8 @@ export enum SetExpectTimeResult {
 
 export enum StartTaskResult {
     Success, HasStarted
+}
+
+export enum StopTaskResult {
+    Success, NotInRunning
 }

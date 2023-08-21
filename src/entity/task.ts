@@ -4,6 +4,7 @@ export class Task {
     goal: string;
     expectTime: number;
     startTime?: Date;
+    private _stopTimes: Date[] = [];
 
     constructor(account: string, project: string, goal: string, expectTime: number) {
         if (expectTime <= 0) {
@@ -17,5 +18,14 @@ export class Task {
 
     isTheSameAs(task: Task): boolean {
         return this.account === task.account && this.project === task.project && this.goal === task.goal;
+    }
+
+    stop(time: Date): boolean {
+        if (!this.startTime) {
+            return false;
+        } else {
+            this._stopTimes.push(time);
+            return true;
+        }
     }
 }

@@ -53,4 +53,14 @@ export class TestTaskStorage implements TaskRepository {
             result.startTime = time;
         }
     }
+
+    async addStopTime(task: Task, time: Date): Promise<void> {
+        const result = this.tasks.find(t => t.isTheSameAs(task));
+
+        if (!result) {
+            throw new TaskNotFound();
+        } else {
+            result.stop(time);
+        }
+    }
 }

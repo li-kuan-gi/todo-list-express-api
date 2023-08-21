@@ -7,7 +7,9 @@ import {
     StartTaskResult,
     startTask,
     AddTaskResult,
-    TaskNotFound
+    TaskNotFound,
+    StopTaskResult,
+    stopTask
 } from "../../src/service/task";
 import { TestTaskStorage } from "./test-task-storage";
 
@@ -100,5 +102,27 @@ describe("start task", () => {
 
     it("throw if no such task", async () => {
         expect(startTask(account, project, goal, new Date(), repo)).rejects.toBeInstanceOf(TaskNotFound);
+    });
+});
+
+describe("stop task", () => {
+    it("success after starting task.", async () => {
+        const startTime = new Date();
+        const stopTime = new Date(startTime.getTime() + 1);
+        await addTask(account, project, goal, 1, repo);
+
+        await startTask(account, project, goal, startTime, repo);
+        const result = await stopTask(account, project, goal, stopTime, repo);
+
+        expect(result).toBe(StopTaskResult.Success);
+    });
+
+    it("fail if the task has not been started.", async () => {
+        const stopTime = new Date();
+        await addTask(account, project, goal, 1, repo);
+
+        const result = await stopTask(account, project, goal, stopTime, repo);
+
+        expect(result).toBe(StopTaskResult.NotInRunning);
     });
 });
