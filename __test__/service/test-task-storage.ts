@@ -24,4 +24,15 @@ export class TestTaskStorage implements TaskRepository {
             return true;
         }
     }
+
+    async updateExpectTime(task: Task, time: number): Promise<boolean> {
+        const result = this.tasks.find(t => t.isTheSameAs(task));
+
+        if (!result) {
+            return false;
+        } else {
+            result.expectTime = time;
+            return true;
+        }
+    }
 }
