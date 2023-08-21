@@ -1,4 +1,4 @@
-import { TaskRepository } from "../../src/service/task";
+import { Task, TaskRepository } from "../../src/service/task";
 
 export class TestTaskStorage implements TaskRepository {
     private readonly tasks: Task[] = [];
@@ -12,18 +12,15 @@ export class TestTaskStorage implements TaskRepository {
 
         return !task;
     }
-}
 
-class Task {
-    account: string;
-    project: string;
-    goal: string;
-    expectTime: number;
+    async remove(task: Task): Promise<boolean> {
+        const result = this.tasks.findIndex(t => t.isTheSameAs(task));
 
-    constructor(account: string, project: string, goal: string, expectTime: number) {
-        this.account = account;
-        this.project = project;
-        this.goal = goal;
-        this.expectTime = expectTime;
+        if (result === -1) {
+            return false;
+        } else {
+            this.tasks.splice(result, 1);
+            return true;
+        }
     }
 }
