@@ -3,6 +3,7 @@ export class Task {
     project: string;
     goal: string;
     expectTime: number;
+    startTime?: Date;
 
     constructor(account: string, project: string, goal: string, expectTime: number) {
         if (expectTime <= 0) {

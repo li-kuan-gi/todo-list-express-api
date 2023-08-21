@@ -48,12 +48,37 @@ export async function setExpectTime(
     }
 }
 
+export async function startTask(
+    account: string,
+    project: string,
+    goal: string,
+    time: Date,
+    repo: TaskRepository
+): Promise<StartTaskResult> {
+    const task = await repo.getTask(account, project, goal);
+
+    if (!task) {
+        return StartTaskResult.NotFound;
+    } else if (task.startTime) {
+        return StartTaskResult.HasStarted;
+    } else {
+        task.startTime = time;
+        return StartTaskResult.Success;
+    }
+};
+
 export interface TaskRepository {
+    getTask(account: string, project: string, goal: string): Promise<Task | undefined>;
     add(task: Task): Promise<boolean>;
     remove(task: Task): Promise<boolean>;
     updateExpectTime(task: Task, time: number): Promise<boolean>;
+    setStartTime(task: Task, time: Date): Promise<boolean>;
 }
 
 export enum SetExpectTimeResult {
     Success, NotFound, InvalidPeriod
+}
+
+export enum StartTaskResult {
+    Success, NotFound, HasStarted
 }
