@@ -15,16 +15,23 @@ export async function addTask(
     goal: string,
     expectTime: number,
     repo: TaskRepository
-): Promise<boolean> {
+): Promise<AddTaskResult> {
     const task = new Task(account, project, goal, expectTime);
 
-    return await repo.add(task);
+    const result = await repo.add(task);
+
+    return result ? AddTaskResult.Success : AddTaskResult.Duplicated;
 }
 
-export async function removeTask(account: string, project: string, goal: string, repo: TaskRepository) {
+export async function removeTask(
+    account: string,
+    project: string,
+    goal: string,
+    repo: TaskRepository
+): Promise<void> {
     const task = new Task(account, project, goal, 1);
 
-    return await repo.remove(task);
+    await repo.remove(task);
 }
 
 export async function setExpectTime(
@@ -38,13 +45,8 @@ export async function setExpectTime(
         return SetExpectTimeResult.InvalidPeriod;
     } else {
         const task = new Task(account, project, goal, 1);
-        const result = await repo.updateExpectTime(task, time);
-
-        if (!result) {
-            return SetExpectTimeResult.NotFound;
-        } else {
-            return SetExpectTimeResult.Success;
-        }
+        await repo.updateExpectTime(task, time);
+        return SetExpectTimeResult.Success;
     }
 }
 
@@ -57,9 +59,7 @@ export async function startTask(
 ): Promise<StartTaskResult> {
     const task = await repo.getTask(account, project, goal);
 
-    if (!task) {
-        return StartTaskResult.NotFound;
-    } else if (task.startTime) {
+    if (task.startTime) {
         return StartTaskResult.HasStarted;
     } else {
         task.startTime = time;
@@ -68,17 +68,23 @@ export async function startTask(
 };
 
 export interface TaskRepository {
-    getTask(account: string, project: string, goal: string): Promise<Task | undefined>;
+    getTask(account: string, project: string, goal: string): Promise<Task>;
     add(task: Task): Promise<boolean>;
-    remove(task: Task): Promise<boolean>;
-    updateExpectTime(task: Task, time: number): Promise<boolean>;
-    setStartTime(task: Task, time: Date): Promise<boolean>;
+    remove(task: Task): Promise<void>;
+    updateExpectTime(task: Task, time: number): Promise<void>;
+    setStartTime(task: Task, time: Date): Promise<void>;
+}
+
+export class TaskNotFound { }
+
+export enum AddTaskResult {
+    Success, Duplicated
 }
 
 export enum SetExpectTimeResult {
-    Success, NotFound, InvalidPeriod
+    Success, InvalidPeriod
 }
 
 export enum StartTaskResult {
-    Success, NotFound, HasStarted
+    Success, HasStarted
 }
