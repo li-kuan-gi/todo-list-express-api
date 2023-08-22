@@ -42,6 +42,12 @@ describe("add task", () => {
 
         expect(result).toBe(AddTaskResult.Duplicated);
     });
+
+    it("fail if expect time is not positive.", async () => {
+        expectTime = 0;
+
+        expect(addTask(account, project, goal, expectTime, repo)).rejects.toThrow();
+    });
 });
 
 describe("remove task", () => {
