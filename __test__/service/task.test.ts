@@ -64,7 +64,6 @@ describe("task-modify service", () => {
     describe("change expect time", () => {
         it("success if the expectTime is a positive number.", async () => {
             const newExpectTime = 2;
-            await addTask(account, project, goal, expectTime, repo);
 
             const result = await changeExpectTime(account, project, goal, newExpectTime, repo);
             const task = await repo.getTask(account, project, goal);
@@ -76,7 +75,6 @@ describe("task-modify service", () => {
 
         it("fail if the expectTime is not a positive number.", async () => {
             const newExpectTime = 0;
-            await addTask(account, project, goal, expectTime, repo);
 
             const result = await changeExpectTime(account, project, goal, newExpectTime, repo);
             const task = await repo.getTask(account, project, goal);
@@ -90,7 +88,6 @@ describe("task-modify service", () => {
     describe("start task", () => {
         it("success if the task has not yet been started.", async () => {
             const time: Date = new Date();
-            await addTask(account, project, goal, expectTime, repo);
 
             const result = await startTask(account, project, goal, time, repo);
 
@@ -100,7 +97,6 @@ describe("task-modify service", () => {
 
         it("fail if the task has been started.", async () => {
             const time: Date = new Date();
-            await addTask(account, project, goal, expectTime, repo);
             startTask(account, project, goal, time, repo);
 
             const result = await startTask(account, project, goal, time, repo);
@@ -111,10 +107,18 @@ describe("task-modify service", () => {
     });
 
     describe("stop task", () => {
-        it("success after starting task.", async () => {
+        it("fail if the task has not been started.", async () => {
+            const stopTime = new Date();
+
+            const result = await stopTask(account, project, goal, stopTime, repo);
+
+            expect(result).toBe(StopTaskResult.NotInRunning);
+            expect(repo.save).not.toBeCalled();
+        });
+
+        it("success if the stop time is after start time.", async () => {
             const startTime = new Date();
             const stopTime = new Date(startTime.getTime() + 1);
-            await addTask(account, project, goal, 1, repo);
 
             await startTask(account, project, goal, startTime, repo);
             const result = await stopTask(account, project, goal, stopTime, repo);
@@ -123,14 +127,15 @@ describe("task-modify service", () => {
             expect(repo.save).toBeCalledTimes(2);
         });
 
-        it("fail if the task has not been started.", async () => {
-            const stopTime = new Date();
-            await addTask(account, project, goal, 1, repo);
+        it("fail if the stop time is before start time.", async () => {
+            const startTime = new Date();
+            const stopTime = new Date(startTime.getTime() - 1);
 
+            await startTask(account, project, goal, startTime, repo);
             const result = await stopTask(account, project, goal, stopTime, repo);
 
             expect(result).toBe(StopTaskResult.NotInRunning);
-            expect(repo.save).not.toBeCalled();
+            expect(repo.save).toBeCalledTimes(1);
         });
     });
 });

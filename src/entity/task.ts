@@ -60,7 +60,7 @@ export class Task {
     }
 
     stop(time: Date): boolean {
-        if (!this._startTime) {
+        if (!this._startTime || time <= this._startTime) {
             return false;
         } else {
             this._stopTimes.push(time);
