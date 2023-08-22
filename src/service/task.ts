@@ -44,8 +44,9 @@ export async function setExpectTime(
     if (time <= 0) {
         return SetExpectTimeResult.InvalidPeriod;
     } else {
-        const task = new Task(account, project, goal, 1);
-        await repo.updateExpectTime(task, time);
+        const task = await repo.getTask(account, project, goal);
+        task.expect(time);
+        await repo.save(task);
         return SetExpectTimeResult.Success;
     }
 }
@@ -59,11 +60,13 @@ export async function startTask(
 ): Promise<StartTaskResult> {
     const task = await repo.getTask(account, project, goal);
 
-    if (task.startTime) {
-        return StartTaskResult.HasStarted;
-    } else {
-        task.startTime = time;
+    const result = task.start(time);
+
+    if (result) {
+        await repo.save(task);
         return StartTaskResult.Success;
+    } else {
+        return StartTaskResult.HasStarted;
     }
 };
 
@@ -78,16 +81,19 @@ export async function stopTask(
 
     const result = task.stop(time);
 
-    return result ? StopTaskResult.Success : StopTaskResult.NotInRunning;
+    if (result) {
+        await repo.save(task);
+        return StopTaskResult.Success;
+    } else {
+        return StopTaskResult.NotInRunning;
+    }
 }
 
 export interface TaskRepository {
     getTask(account: string, project: string, goal: string): Promise<Task>;
     add(task: Task): Promise<boolean>;
     remove(task: Task): Promise<void>;
-    updateExpectTime(task: Task, time: number): Promise<void>;
-    setStartTime(task: Task, time: Date): Promise<void>;
-    addStopTime(task: Task, time: Date): Promise<void>;
+    save(task: Task): Promise<void>;
 }
 
 export class TaskNotFound { }

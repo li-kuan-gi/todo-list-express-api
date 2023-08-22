@@ -62,8 +62,11 @@ describe("setExpectTime", () => {
         await addTask(account, project, goal, expectTime, repo);
 
         const result = await setExpectTime(account, project, goal, newExpectTime, repo);
+        const task = await repo.getTask(account, project, goal);
 
         expect(result).toBe(SetExpectTimeResult.Success);
+        expect(repo.save).toBeCalledTimes(1);
+        expect(task.expectTime).toBe(newExpectTime);
     });
 
     it("fail if the expectTime is not a positive number.", async () => {
@@ -71,8 +74,11 @@ describe("setExpectTime", () => {
         await addTask(account, project, goal, expectTime, repo);
 
         const result = await setExpectTime(account, project, goal, newExpectTime, repo);
+        const task = await repo.getTask(account, project, goal);
 
         expect(result).toBe(SetExpectTimeResult.InvalidPeriod);
+        expect(repo.save).not.toBeCalled();
+        expect(task.expectTime).toBe(expectTime);
     });
 
     it("throw if no such task", async () => {
@@ -88,6 +94,7 @@ describe("start task", () => {
         const result = await startTask(account, project, goal, time, repo);
 
         expect(result).toBe(StartTaskResult.Success);
+        expect(repo.save).toBeCalledTimes(1);
     });
 
     it("fail if the task has been started.", async () => {
@@ -98,6 +105,7 @@ describe("start task", () => {
         const result = await startTask(account, project, goal, time, repo);
 
         expect(result).toBe(StartTaskResult.HasStarted);
+        expect(repo.save).toBeCalledTimes(1);
     });
 
     it("throw if no such task", async () => {
@@ -115,6 +123,7 @@ describe("stop task", () => {
         const result = await stopTask(account, project, goal, stopTime, repo);
 
         expect(result).toBe(StopTaskResult.Success);
+        expect(repo.save).toBeCalledTimes(2);
     });
 
     it("fail if the task has not been started.", async () => {
@@ -124,5 +133,6 @@ describe("stop task", () => {
         const result = await stopTask(account, project, goal, stopTime, repo);
 
         expect(result).toBe(StopTaskResult.NotInRunning);
+        expect(repo.save).not.toBeCalled();
     });
 });

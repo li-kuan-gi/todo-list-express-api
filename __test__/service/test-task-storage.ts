@@ -34,33 +34,5 @@ export class TestTaskStorage implements TaskRepository {
         }
     }
 
-    async updateExpectTime(task: Task, time: number): Promise<void> {
-        const result = this.tasks.find(t => t.isTheSameAs(task));
-
-        if (!result) {
-            throw new TaskNotFound();
-        } else {
-            result.expectTime = time;
-        }
-    }
-
-    async setStartTime(task: Task, time: Date): Promise<void> {
-        const result = this.tasks.find(t => t.isTheSameAs(task));
-
-        if (!result) {
-            throw new TaskNotFound();
-        } else {
-            result.startTime = time;
-        }
-    }
-
-    async addStopTime(task: Task, time: Date): Promise<void> {
-        const result = this.tasks.find(t => t.isTheSameAs(task));
-
-        if (!result) {
-            throw new TaskNotFound();
-        } else {
-            result.stop(time);
-        }
-    }
+    save: (task: Task) => Promise<void> = jest.fn();
 }
