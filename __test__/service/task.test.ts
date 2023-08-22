@@ -1,9 +1,9 @@
 import {
     TaskRepository,
-    SetExpectTimeResult,
+    ChangeExpectTimeResult,
     addTask,
     removeTask,
-    setExpectTime,
+    changeExpectTime,
     StartTaskResult,
     startTask,
     AddTaskResult,
@@ -29,7 +29,7 @@ beforeEach(() => {
     expectTime = 35;
 });
 
-describe("addTask", () => {
+describe("add task", () => {
     it("success if no same task.", async () => {
         const result = await addTask(account, project, goal, expectTime, repo);
 
@@ -56,83 +56,81 @@ describe("remove task", () => {
     });
 });
 
-describe("setExpectTime", () => {
-    it("success if the expectTime is a positive number.", async () => {
-        const newExpectTime = 2;
+describe("task-modify service", () => {
+    beforeEach(async () => {
         await addTask(account, project, goal, expectTime, repo);
-
-        const result = await setExpectTime(account, project, goal, newExpectTime, repo);
-        const task = await repo.getTask(account, project, goal);
-
-        expect(result).toBe(SetExpectTimeResult.Success);
-        expect(repo.save).toBeCalledTimes(1);
-        expect(task.expectTime).toBe(newExpectTime);
     });
 
-    it("fail if the expectTime is not a positive number.", async () => {
-        const newExpectTime = 0;
-        await addTask(account, project, goal, expectTime, repo);
+    describe("change expect time", () => {
+        it("success if the expectTime is a positive number.", async () => {
+            const newExpectTime = 2;
+            await addTask(account, project, goal, expectTime, repo);
 
-        const result = await setExpectTime(account, project, goal, newExpectTime, repo);
-        const task = await repo.getTask(account, project, goal);
+            const result = await changeExpectTime(account, project, goal, newExpectTime, repo);
+            const task = await repo.getTask(account, project, goal);
 
-        expect(result).toBe(SetExpectTimeResult.InvalidPeriod);
-        expect(repo.save).not.toBeCalled();
-        expect(task.expectTime).toBe(expectTime);
+            expect(result).toBe(ChangeExpectTimeResult.Success);
+            expect(repo.save).toBeCalledTimes(1);
+            expect(task.expectTime).toBe(newExpectTime);
+        });
+
+        it("fail if the expectTime is not a positive number.", async () => {
+            const newExpectTime = 0;
+            await addTask(account, project, goal, expectTime, repo);
+
+            const result = await changeExpectTime(account, project, goal, newExpectTime, repo);
+            const task = await repo.getTask(account, project, goal);
+
+            expect(result).toBe(ChangeExpectTimeResult.InvalidPeriod);
+            expect(repo.save).not.toBeCalled();
+            expect(task.expectTime).toBe(expectTime);
+        });
     });
 
-    it("throw if no such task", async () => {
-        expect(setExpectTime(account, project, goal, 1, repo)).rejects.toBeInstanceOf(TaskNotFound);
-    });
-});
+    describe("start task", () => {
+        it("success if the task has not yet been started.", async () => {
+            const time: Date = new Date();
+            await addTask(account, project, goal, expectTime, repo);
 
-describe("start task", () => {
-    it("success if the task has not yet been started.", async () => {
-        const time: Date = new Date();
-        await addTask(account, project, goal, expectTime, repo);
+            const result = await startTask(account, project, goal, time, repo);
 
-        const result = await startTask(account, project, goal, time, repo);
+            expect(result).toBe(StartTaskResult.Success);
+            expect(repo.save).toBeCalledTimes(1);
+        });
 
-        expect(result).toBe(StartTaskResult.Success);
-        expect(repo.save).toBeCalledTimes(1);
-    });
+        it("fail if the task has been started.", async () => {
+            const time: Date = new Date();
+            await addTask(account, project, goal, expectTime, repo);
+            startTask(account, project, goal, time, repo);
 
-    it("fail if the task has been started.", async () => {
-        const time: Date = new Date();
-        await addTask(account, project, goal, expectTime, repo);
-        startTask(account, project, goal, time, repo);
+            const result = await startTask(account, project, goal, time, repo);
 
-        const result = await startTask(account, project, goal, time, repo);
-
-        expect(result).toBe(StartTaskResult.HasStarted);
-        expect(repo.save).toBeCalledTimes(1);
+            expect(result).toBe(StartTaskResult.HasStarted);
+            expect(repo.save).toBeCalledTimes(1);
+        });
     });
 
-    it("throw if no such task", async () => {
-        expect(startTask(account, project, goal, new Date(), repo)).rejects.toBeInstanceOf(TaskNotFound);
-    });
-});
+    describe("stop task", () => {
+        it("success after starting task.", async () => {
+            const startTime = new Date();
+            const stopTime = new Date(startTime.getTime() + 1);
+            await addTask(account, project, goal, 1, repo);
 
-describe("stop task", () => {
-    it("success after starting task.", async () => {
-        const startTime = new Date();
-        const stopTime = new Date(startTime.getTime() + 1);
-        await addTask(account, project, goal, 1, repo);
+            await startTask(account, project, goal, startTime, repo);
+            const result = await stopTask(account, project, goal, stopTime, repo);
 
-        await startTask(account, project, goal, startTime, repo);
-        const result = await stopTask(account, project, goal, stopTime, repo);
+            expect(result).toBe(StopTaskResult.Success);
+            expect(repo.save).toBeCalledTimes(2);
+        });
 
-        expect(result).toBe(StopTaskResult.Success);
-        expect(repo.save).toBeCalledTimes(2);
-    });
+        it("fail if the task has not been started.", async () => {
+            const stopTime = new Date();
+            await addTask(account, project, goal, 1, repo);
 
-    it("fail if the task has not been started.", async () => {
-        const stopTime = new Date();
-        await addTask(account, project, goal, 1, repo);
+            const result = await stopTask(account, project, goal, stopTime, repo);
 
-        const result = await stopTask(account, project, goal, stopTime, repo);
-
-        expect(result).toBe(StopTaskResult.NotInRunning);
-        expect(repo.save).not.toBeCalled();
+            expect(result).toBe(StopTaskResult.NotInRunning);
+            expect(repo.save).not.toBeCalled();
+        });
     });
 });

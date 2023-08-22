@@ -34,20 +34,20 @@ export async function removeTask(
     await repo.remove(task);
 }
 
-export async function setExpectTime(
+export async function changeExpectTime(
     account: string,
     project: string,
     goal: string,
     time: number,
     repo: TaskRepository
-): Promise<SetExpectTimeResult> {
+): Promise<ChangeExpectTimeResult> {
     if (time <= 0) {
-        return SetExpectTimeResult.InvalidPeriod;
+        return ChangeExpectTimeResult.InvalidPeriod;
     } else {
         const task = await repo.getTask(account, project, goal);
         task.expect(time);
         await repo.save(task);
-        return SetExpectTimeResult.Success;
+        return ChangeExpectTimeResult.Success;
     }
 }
 
@@ -102,7 +102,7 @@ export enum AddTaskResult {
     Success, Duplicated
 }
 
-export enum SetExpectTimeResult {
+export enum ChangeExpectTimeResult {
     Success, InvalidPeriod
 }
 
