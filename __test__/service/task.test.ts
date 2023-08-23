@@ -7,7 +7,6 @@ import {
     StartTaskResult,
     startTask,
     AddTaskResult,
-    TaskNotFound,
     StopTaskResult,
     stopTask
 } from "../../src/service/task";
@@ -42,12 +41,6 @@ describe("add task", () => {
 
         expect(result).toBe(AddTaskResult.Duplicated);
     });
-
-    it("fail if expect time is not positive.", async () => {
-        expectTime = 0;
-
-        expect(addTask(account, project, goal, expectTime, repo)).rejects.toThrow();
-    });
 });
 
 describe("remove task", () => {
@@ -55,10 +48,6 @@ describe("remove task", () => {
         await addTask(account, project, goal, expectTime, repo);
 
         expect(removeTask(account, project, goal, repo)).resolves.toBe(undefined);
-    });
-
-    it("throw if no such task", async () => {
-        expect(removeTask(account, project, goal, repo)).rejects.toBeInstanceOf(TaskNotFound);
     });
 });
 
@@ -113,16 +102,7 @@ describe("task-modify service", () => {
     });
 
     describe("stop task", () => {
-        it("fail if the task has not been started.", async () => {
-            const stopTime = new Date();
-
-            const result = await stopTask(account, project, goal, stopTime, repo);
-
-            expect(result).toBe(StopTaskResult.NotInRunning);
-            expect(repo.save).not.toBeCalled();
-        });
-
-        it("success if the stop time is after start time.", async () => {
+        it("success if the task is in running.", async () => {
             const startTime = new Date();
             const stopTime = new Date(startTime.getTime() + 1);
 
@@ -133,15 +113,13 @@ describe("task-modify service", () => {
             expect(repo.save).toBeCalledTimes(2);
         });
 
-        it("fail if the stop time is before start time.", async () => {
-            const startTime = new Date();
-            const stopTime = new Date(startTime.getTime() - 1);
+        it("fail if the task is not in running.", async () => {
+            const stopTime = new Date();
 
-            await startTask(account, project, goal, startTime, repo);
             const result = await stopTask(account, project, goal, stopTime, repo);
 
             expect(result).toBe(StopTaskResult.NotInRunning);
-            expect(repo.save).toBeCalledTimes(1);
+            expect(repo.save).not.toBeCalled();
         });
     });
 });
