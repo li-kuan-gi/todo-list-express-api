@@ -6,6 +6,13 @@ export class Task {
     private _startTime?: Date;
     private _stopTimes: Date[] = [];
 
+    /**
+     * 
+     * @param account 
+     * @param project 
+     * @param goal 
+     * @param expectTime - should be positive, unit is minute.
+     */
     constructor(account: string, project: string, goal: string, expectTime: number) {
         if (expectTime <= 0) {
             throw new Error("expect time should be a positive number.");

@@ -16,10 +16,11 @@ export async function addTask(
     expectTime: number,
     repo: TaskRepository
 ): Promise<AddTaskResult> {
+    if (expectTime <= 0) {
+        return AddTaskResult.InvalidExpectTime;
+    }
     const task = new Task(account, project, goal, expectTime);
-
     const result = await repo.add(task);
-
     return result ? AddTaskResult.Success : AddTaskResult.Duplicated;
 }
 
@@ -99,7 +100,7 @@ export interface TaskRepository {
 export class TaskNotFound { }
 
 export enum AddTaskResult {
-    Success, Duplicated
+    Success, Duplicated, InvalidExpectTime
 }
 
 export enum ChangeExpectTimeResult {
