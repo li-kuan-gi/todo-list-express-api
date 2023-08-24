@@ -8,25 +8,25 @@ beforeEach(() => {
 
 describe("task", () => {
     describe("initialization", () => {
-        it("expect time should be positive.", () => {
-            const expectTime = 0;
+        it("expect duration should be positive.", () => {
+            const expectDuration = 0;
 
-            expect(() => new Task("a", "b", "c", expectTime)).toThrow();
+            expect(() => new Task("a", "b", "c", expectDuration)).toThrow();
         });
     });
 
     describe("expect", () => {
-        it("return true if the time is positive", () => {
-            const time = 2;
+        it("return true if the duration is positive", () => {
+            const duration = 2;
 
-            const result = task.expect(time);
+            const result = task.expect(duration);
 
             expect(result).toBeTruthy();
         });
 
-        it("return false if the is not positive", () => {
-            const time = 0;
-            const result = task.expect(time);
+        it("return false if the duration is not positive", () => {
+            const duration = 0;
+            const result = task.expect(duration);
             expect(result).toBeFalsy();
         });
     });

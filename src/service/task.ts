@@ -17,7 +17,7 @@ export async function addTask(
     repo: TaskRepository
 ): Promise<AddTaskResult> {
     if (expectTime <= 0) {
-        return AddTaskResult.InvalidExpectTime;
+        return AddTaskResult.InvalidExpectDuration;
     }
     const task = new Task(account, project, goal, expectTime);
     const result = await repo.add(task);
@@ -35,20 +35,20 @@ export async function removeTask(
     await repo.remove(task);
 }
 
-export async function changeExpectTime(
+export async function changeExpectDuration(
     account: string,
     project: string,
     goal: string,
     time: number,
     repo: TaskRepository
-): Promise<ChangeExpectTimeResult> {
+): Promise<ChangeExpectDurationResult> {
     if (time <= 0) {
-        return ChangeExpectTimeResult.InvalidPeriod;
+        return ChangeExpectDurationResult.InvalidDuration;
     } else {
         const task = await repo.getTask(account, project, goal);
         task.expect(time);
         await repo.save(task);
-        return ChangeExpectTimeResult.Success;
+        return ChangeExpectDurationResult.Success;
     }
 }
 
@@ -100,11 +100,11 @@ export interface TaskRepository {
 export class TaskNotFound { }
 
 export enum AddTaskResult {
-    Success, Duplicated, InvalidExpectTime
+    Success, Duplicated, InvalidExpectDuration
 }
 
-export enum ChangeExpectTimeResult {
-    Success, InvalidPeriod
+export enum ChangeExpectDurationResult {
+    Success, InvalidDuration
 }
 
 export enum StartTaskResult {

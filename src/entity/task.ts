@@ -2,7 +2,7 @@ export class Task {
     private _account: string;
     private _project: string;
     private _goal: string;
-    private _expectTime: number;
+    private _expectDuration: number;
     private _startTime?: Date;
     private _stopTimes: Date[] = [];
 
@@ -11,16 +11,16 @@ export class Task {
      * @param account 
      * @param project 
      * @param goal 
-     * @param expectTime - should be positive, unit is minute.
+     * @param expectDuration - should be positive, unit is minute.
      */
-    constructor(account: string, project: string, goal: string, expectTime: number) {
-        if (expectTime <= 0) {
+    constructor(account: string, project: string, goal: string, expectDuration: number) {
+        if (expectDuration <= 0) {
             throw new Error("expect time should be a positive number.");
         }
         this._account = account;
         this._project = project;
         this._goal = goal;
-        this._expectTime = expectTime;
+        this._expectDuration = expectDuration;
     }
 
     get account(): string {
@@ -35,8 +35,8 @@ export class Task {
         return this._goal;
     }
 
-    get expectTime(): number {
-        return this._expectTime;
+    get expectDuration(): number {
+        return this._expectDuration;
     }
 
     isTheSameAs(task: Task): boolean {
@@ -52,7 +52,7 @@ export class Task {
         if (time <= 0) {
             return false;
         } else {
-            this._expectTime = time;
+            this._expectDuration = time;
             return true;
         }
     }

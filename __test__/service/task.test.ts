@@ -1,9 +1,9 @@
 import {
     TaskRepository,
-    ChangeExpectTimeResult,
+    ChangeExpectDurationResult,
     addTask,
     removeTask,
-    changeExpectTime,
+    changeExpectDuration,
     StartTaskResult,
     startTask,
     AddTaskResult,
@@ -15,7 +15,7 @@ import { TestTaskStorage } from "./test-task-storage";
 let account: string;
 let project: string;
 let goal: string;
-let expectTime: number;
+let expectDuration: number;
 let storage: TestTaskStorage;
 let repo: TaskRepository;
 
@@ -25,33 +25,33 @@ beforeEach(() => {
     account = "test account";
     project = "test project";
     goal = "test goal";
-    expectTime = 35;
+    expectDuration = 35;
 });
 
 describe("add task", () => {
     it("success if no same task.", async () => {
-        const result = await addTask(account, project, goal, expectTime, repo);
+        const result = await addTask(account, project, goal, expectDuration, repo);
 
         expect(result).toBe(AddTaskResult.Success);
     });
 
     it("fail if there is duplicated task.", async () => {
-        await addTask(account, project, goal, expectTime, repo);
-        const result = await addTask(account, project, goal, expectTime, repo);
+        await addTask(account, project, goal, expectDuration, repo);
+        const result = await addTask(account, project, goal, expectDuration, repo);
 
         expect(result).toBe(AddTaskResult.Duplicated);
     });
 
-    it("fail if the expect time is not positive.", async () => {
-        const expectTime = 0;
-        const result = await addTask(account, project, goal, expectTime, repo);
-        expect(result).toBe(AddTaskResult.InvalidExpectTime);
+    it("fail if the expect duration is not positive.", async () => {
+        const duration = 0;
+        const result = await addTask(account, project, goal, duration, repo);
+        expect(result).toBe(AddTaskResult.InvalidExpectDuration);
     });
 });
 
 describe("remove task", () => {
     it("success if there is such task.", async () => {
-        await addTask(account, project, goal, expectTime, repo);
+        await addTask(account, project, goal, expectDuration, repo);
 
         expect(removeTask(account, project, goal, repo)).resolves.toBe(undefined);
     });
@@ -59,30 +59,30 @@ describe("remove task", () => {
 
 describe("task-modify service", () => {
     beforeEach(async () => {
-        await addTask(account, project, goal, expectTime, repo);
+        await addTask(account, project, goal, expectDuration, repo);
     });
 
-    describe("change expect time", () => {
-        it("success if the expectTime is a positive number.", async () => {
-            const newExpectTime = 2;
+    describe("change expect duration", () => {
+        it("success if the duration is a positive number.", async () => {
+            const duration = 2;
 
-            const result = await changeExpectTime(account, project, goal, newExpectTime, repo);
+            const result = await changeExpectDuration(account, project, goal, duration, repo);
             const task = await repo.getTask(account, project, goal);
 
-            expect(result).toBe(ChangeExpectTimeResult.Success);
+            expect(result).toBe(ChangeExpectDurationResult.Success);
             expect(repo.save).toBeCalledTimes(1);
-            expect(task.expectTime).toBe(newExpectTime);
+            expect(task.expectDuration).toBe(duration);
         });
 
-        it("fail if the expectTime is not a positive number.", async () => {
-            const newExpectTime = 0;
+        it("fail if the duration is not a positive number.", async () => {
+            const duration = 0;
 
-            const result = await changeExpectTime(account, project, goal, newExpectTime, repo);
+            const result = await changeExpectDuration(account, project, goal, duration, repo);
             const task = await repo.getTask(account, project, goal);
 
-            expect(result).toBe(ChangeExpectTimeResult.InvalidPeriod);
+            expect(result).toBe(ChangeExpectDurationResult.InvalidDuration);
             expect(repo.save).not.toBeCalled();
-            expect(task.expectTime).toBe(expectTime);
+            expect(task.expectDuration).toBe(expectDuration);
         });
     });
 
