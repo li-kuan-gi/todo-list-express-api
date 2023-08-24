@@ -10,7 +10,9 @@ import {
     stopTask,
     AddTaskFailure,
     ResumeTaskResult,
-    resumeTask
+    resumeTask,
+    completeTask,
+    CompleteTaskResult
 } from "../../src/service/task";
 import { TestTaskStorage } from "./test-task-storage";
 
@@ -155,6 +157,28 @@ describe("task-modify service", () => {
 
             expect(result).toBe(ResumeTaskResult.NotStopped);
             expect(repo.save).toBeCalledTimes(1);
+        });
+    });
+
+    describe("complete task", () => {
+        it("success if the task is in running.", async () => {
+            const startTime = new Date();
+            const time = new Date(startTime.getTime() + 1);
+
+            await startTask(id, startTime, repo);
+            const result = await completeTask(id, time, repo);
+
+            expect(result).toBe(CompleteTaskResult.Success);
+            expect(repo.save).toBeCalledTimes(2);
+        });
+
+        it("fail if the task is not in running.", async () => {
+            const time = new Date();
+
+            const result = await completeTask(id, time, repo);
+
+            expect(result).toBe(CompleteTaskResult.NotInRunning);
+            expect(repo.save).not.toBeCalled();
         });
     });
 });

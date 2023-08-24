@@ -95,6 +95,21 @@ export async function resumeTask(
     }
 }
 
+export async function completeTask(
+    id: string,
+    time: Date,
+    repo: TaskRepository
+): Promise<CompleteTaskResult> {
+    const task = await repo.getTaskByID(id);
+    const result = task.complete(time);
+    if (result) {
+        await repo.save(task);
+        return CompleteTaskResult.Success;
+    } else {
+        return CompleteTaskResult.NotInRunning;
+    }
+}
+
 export interface TaskRepository {
     getTask(account: string, project: string, goal: string): Promise<Task | undefined>;
     getTaskByID(id: string): Promise<Task>;
@@ -123,4 +138,8 @@ export enum StopTaskResult {
 
 export enum ResumeTaskResult {
     Success, NotStopped
+}
+
+export enum CompleteTaskResult {
+    Success, NotInRunning
 }

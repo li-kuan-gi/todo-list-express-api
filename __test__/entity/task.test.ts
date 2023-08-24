@@ -1,5 +1,5 @@
-import { time } from "console";
 import { Task, TimeReverse } from "../../src/entity/task";
+import { start } from "repl";
 
 let task: Task;
 
@@ -110,6 +110,18 @@ describe("task", () => {
 
                 expect(result).toBeFalsy();
             });
+
+            it("e.g. after completing", () => {
+                const startTime = new Date();
+                const completeTime = new Date(startTime.getTime() + 1);
+                const time = new Date(startTime.getTime() + 2);
+
+                task.start(startTime);
+                task.complete(completeTime);
+                const result = task.stop(time);
+
+                expect(result).toBeFalsy();
+            });
         });
     });
 
@@ -149,6 +161,66 @@ describe("task", () => {
                 task.stop(stopTime);
                 task.resume(firstResumeTime);
                 const result = task.resume(time);
+
+                expect(result).toBeFalsy();
+            });
+
+            it("e.g. after completing", () => {
+                const startTime = new Date();
+                const completeTime = new Date(startTime.getTime() + 1);
+                const time = new Date(startTime.getTime() + 2);
+
+                task.start(startTime);
+                task.complete(completeTime);
+                const result = task.resume(time);
+
+                expect(result).toBeFalsy();
+            });
+        });
+    });
+
+    describe("complete", () => {
+        describe("success if the task is in running", () => {
+            it("e.g. after starting task", () => {
+                const startTime = new Date();
+                const time = new Date(startTime.getTime() + 1);
+
+                task.start(startTime);
+                const result = task.complete(time);
+
+                expect(result).toBeTruthy();
+            });
+
+            it("e.g. after resuming task", () => {
+                const startTime = new Date();
+                const stopTime = new Date(startTime.getTime() + 1);
+                const resumeTime = new Date(startTime.getTime() + 2);
+                const time = new Date(startTime.getTime() + 3);
+
+                task.start(startTime);
+                task.stop(stopTime);
+                task.resume(resumeTime);
+                const result = task.complete(time);
+
+                expect(result).toBeTruthy();
+            });
+        });
+
+        describe("fail if the task not in running", () => {
+            it("e.g. not starting task.", () => {
+                const time = new Date();
+                const result = task.complete(time);
+                expect(result).toBeFalsy();
+            });
+
+            it("e.g. after stopping task.", () => {
+                const startTime = new Date();
+                const stopTime = new Date(startTime.getTime() + 1);
+                const time = new Date(startTime.getTime() + 2);
+
+                task.start(startTime);
+                task.stop(stopTime);
+                const result = task.complete(time);
 
                 expect(result).toBeFalsy();
             });

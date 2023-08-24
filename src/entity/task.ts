@@ -5,6 +5,7 @@ export class Task {
     private _goal: string;
     private _expectDuration: number;
     private _startTime?: Date;
+    private _completeTime?: Date;
     private _stopTimes: Date[] = [];
     private _resumeTimes: Date[] = [];
 
@@ -97,7 +98,7 @@ export class Task {
     stop(time: Date): boolean {
         this.checkNoTimeReverse(time);
 
-        if (!this._startTime || this._stopTimes.length !== this._resumeTimes.length) {
+        if (!this._startTime || this._stopTimes.length !== this._resumeTimes.length || this._completeTime) {
             return false;
         } else {
             this._stopTimes.push(time);
@@ -112,6 +113,16 @@ export class Task {
             return false;
         } else {
             this._resumeTimes.push(time);
+            return true;
+        }
+    }
+
+    complete(time: Date): boolean {
+        this.checkNoTimeReverse(time);
+        if (!this._startTime || this._stopTimes.length !== this._resumeTimes.length) {
+            return false;
+        } else {
+            this._completeTime = time;
             return true;
         }
     }
