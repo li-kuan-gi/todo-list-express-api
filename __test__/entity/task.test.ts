@@ -1,4 +1,5 @@
-import { Task } from "../../src/entity/task";
+import { time } from "console";
+import { Task, TimeReverse } from "../../src/entity/task";
 
 let task: Task;
 
@@ -28,6 +29,22 @@ describe("task", () => {
             const duration = 0;
             const result = task.expect(duration);
             expect(result).toBeFalsy();
+        });
+    });
+
+    describe("checkNoTimeResverse", () => {
+        it("pass if the time is after last operation time.", () => {
+            const startTime = new Date();
+            const time = new Date(startTime.getTime() + 1);
+            task.start(startTime);
+            expect(() => task.checkNoTimeReverse(time)).not.toThrow();
+        });
+
+        it("throw if the time is not after operation time", () => {
+            const startTime = new Date();
+            const time = new Date(startTime.getTime() - 1);
+            task.start(startTime);
+            expect(() => task.checkNoTimeReverse(time)).toThrow(TimeReverse);
         });
     });
 
@@ -84,11 +101,12 @@ describe("task", () => {
 
             it("e.g. consecutively stop a task.", () => {
                 const startTime = new Date();
-                const stopTime = new Date(startTime.getTime() + 1);
+                const firstStopTime = new Date(startTime.getTime() + 1);
+                const time = new Date(startTime.getTime() + 2);
 
                 task.start(startTime);
-                task.stop(stopTime);
-                const result = task.stop(stopTime);
+                task.stop(firstStopTime);
+                const result = task.stop(time);
 
                 expect(result).toBeFalsy();
             });

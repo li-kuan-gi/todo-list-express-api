@@ -48,6 +48,25 @@ export class Task {
         return this._expectDuration;
     }
 
+    get _lastOpTime(): Date | undefined {
+        if (!this._startTime) {
+            return undefined;
+        } else if (this._stopTimes.length === 0) {
+            return this._startTime;
+        } else if (this._resumeTimes.length === 0) {
+            return this._stopTimes[0];
+        } else {
+            const lastStopTime = this._stopTimes[this._stopTimes.length - 1];
+            const lastResumeTime = this._resumeTimes[this._resumeTimes.length - 1];
+
+            return lastResumeTime > lastStopTime ? lastResumeTime : lastStopTime;
+        }
+    }
+
+    checkNoTimeReverse(time: Date): void {
+        if (this._lastOpTime && time <= this._lastOpTime) throw new TimeReverse();
+    }
+
     isTheSameAs(task: Task): boolean {
         return this._account === task._account && this._project === task._project && this._goal === task._goal;
     }
@@ -76,6 +95,8 @@ export class Task {
     }
 
     stop(time: Date): boolean {
+        this.checkNoTimeReverse(time);
+
         if (!this._startTime || this._stopTimes.length !== this._resumeTimes.length) {
             return false;
         } else {
@@ -85,6 +106,8 @@ export class Task {
     }
 
     resume(time: Date): boolean {
+        this.checkNoTimeReverse(time);
+
         if (!this._startTime || this._stopTimes.length !== this._resumeTimes.length + 1) {
             return false;
         } else {
@@ -93,3 +116,5 @@ export class Task {
         }
     }
 }
+
+export class TimeReverse { }
