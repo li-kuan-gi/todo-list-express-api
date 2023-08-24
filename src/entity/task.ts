@@ -1,4 +1,5 @@
 export class Task {
+    public readonly id: string | undefined;
     private _account: string;
     private _project: string;
     private _goal: string;
@@ -13,10 +14,17 @@ export class Task {
      * @param goal 
      * @param expectDuration - should be positive, unit is minute.
      */
-    constructor(account: string, project: string, goal: string, expectDuration: number) {
+    constructor(
+        account: string,
+        project: string,
+        goal: string,
+        expectDuration: number,
+        id?: string
+    ) {
         if (expectDuration <= 0) {
             throw new Error("expect time should be a positive number.");
         }
+        this.id = id;
         this._account = account;
         this._project = project;
         this._goal = goal;
@@ -45,14 +53,14 @@ export class Task {
 
     /**
      * 
-     * @param time - the unit is "minute", e.g. for time=3, it means "expect 3 minute"
+     * @param duration - the unit is "minute", e.g. for duration=3, it means "expect 3 minute"
      * @returns 
      */
-    expect(time: number): boolean {
-        if (time <= 0) {
+    expect(duration: number): boolean {
+        if (duration <= 0) {
             return false;
         } else {
-            this._expectDuration = time;
+            this._expectDuration = duration;
             return true;
         }
     }

@@ -15,51 +15,43 @@ export async function addTask(
     goal: string,
     expectTime: number,
     repo: TaskRepository
-): Promise<AddTaskResult> {
+): Promise<string | AddTaskFailure> {
     if (expectTime <= 0) {
-        return AddTaskResult.InvalidExpectDuration;
+        return AddTaskFailure.InvalidExpectDuration;
     }
     const task = new Task(account, project, goal, expectTime);
-    const result = await repo.add(task);
-    return result ? AddTaskResult.Success : AddTaskResult.Duplicated;
+    const id = await repo.add(task);
+    return id || AddTaskFailure.Duplicated;
 }
 
 export async function removeTask(
-    account: string,
-    project: string,
-    goal: string,
+    id: string,
     repo: TaskRepository
 ): Promise<void> {
-    const task = new Task(account, project, goal, 1);
-
-    await repo.remove(task);
+    await repo.remove(id);
 }
 
 export async function changeExpectDuration(
-    account: string,
-    project: string,
-    goal: string,
-    time: number,
+    id: string,
+    duration: number,
     repo: TaskRepository
 ): Promise<ChangeExpectDurationResult> {
-    if (time <= 0) {
+    if (duration <= 0) {
         return ChangeExpectDurationResult.InvalidDuration;
     } else {
-        const task = await repo.getTask(account, project, goal);
-        task.expect(time);
+        const task = await repo.getTaskByID(id);
+        task.expect(duration);
         await repo.save(task);
         return ChangeExpectDurationResult.Success;
     }
 }
 
 export async function startTask(
-    account: string,
-    project: string,
-    goal: string,
+    id: string,
     time: Date,
     repo: TaskRepository
 ): Promise<StartTaskResult> {
-    const task = await repo.getTask(account, project, goal);
+    const task = await repo.getTaskByID(id);
 
     const result = task.start(time);
 
@@ -72,13 +64,11 @@ export async function startTask(
 };
 
 export async function stopTask(
-    account: string,
-    project: string,
-    goal: string,
+    id: string,
     time: Date,
     repo: TaskRepository
 ): Promise<StopTaskResult> {
-    const task = await repo.getTask(account, project, goal);
+    const task = await repo.getTaskByID(id);
 
     const result = task.stop(time);
 
@@ -91,16 +81,17 @@ export async function stopTask(
 }
 
 export interface TaskRepository {
-    getTask(account: string, project: string, goal: string): Promise<Task>;
-    add(task: Task): Promise<boolean>;
-    remove(task: Task): Promise<void>;
+    getTask(account: string, project: string, goal: string): Promise<Task | undefined>;
+    getTaskByID(id: string): Promise<Task>;
+    add(task: Task): Promise<string | undefined>;
+    remove(id: string): Promise<void>;
     save(task: Task): Promise<void>;
 }
 
 export class TaskNotFound { }
 
-export enum AddTaskResult {
-    Success, Duplicated, InvalidExpectDuration
+export enum AddTaskFailure {
+    Duplicated, InvalidExpectDuration
 }
 
 export enum ChangeExpectDurationResult {
