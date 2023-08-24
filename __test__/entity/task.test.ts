@@ -47,41 +47,45 @@ describe("task", () => {
     });
 
     describe("stop", () => {
-        it("return true if stop time is after start time.", () => {
-            const startTime = new Date();
-            const stopTime = new Date(startTime.getTime() + 1);
+        describe("success if the task is in running", () => {
+            it("e.g. stop time is after start time.", () => {
+                const startTime = new Date();
+                const stopTime = new Date(startTime.getTime() + 1);
 
-            task.start(startTime);
-            const result = task.stop(stopTime);
+                task.start(startTime);
+                const result = task.stop(stopTime);
 
-            expect(result).toBeTruthy();
+                expect(result).toBeTruthy();
+            });
         });
 
-        it("return false if the stop time is before start time.", () => {
-            const startTime = new Date();
-            const stopTime = new Date(startTime.getTime() - 1);
+        describe("fail if the task is not in running.", () => {
+            it("return false if the stop time is before start time.", () => {
+                const startTime = new Date();
+                const stopTime = new Date(startTime.getTime() - 1);
 
-            task.start(startTime);
-            const result = task.stop(stopTime);
+                task.start(startTime);
+                const result = task.stop(stopTime);
 
-            expect(result).toBeFalsy();
-        });
+                expect(result).toBeFalsy();
+            });
 
-        it("return false if the task has not been started.", () => {
-            const stopTime = new Date();
+            it("return false if the task has not been started.", () => {
+                const stopTime = new Date();
 
-            const result = task.stop(stopTime);
+                const result = task.stop(stopTime);
 
-            expect(result).toBeFalsy();
-        });
+                expect(result).toBeFalsy();
+            });
 
-        it("return false if consecutively stop a task.", () => {
-            const stopTime = new Date();
+            it("return false if consecutively stop a task.", () => {
+                const stopTime = new Date();
 
-            task.stop(stopTime);
-            const result = task.stop(stopTime);
+                task.stop(stopTime);
+                const result = task.stop(stopTime);
 
-            expect(result).toBeFalsy();
+                expect(result).toBeFalsy();
+            });
         });
     });
 });
