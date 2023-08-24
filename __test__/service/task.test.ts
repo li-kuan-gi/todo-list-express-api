@@ -8,7 +8,9 @@ import {
     startTask,
     StopTaskResult,
     stopTask,
-    AddTaskFailure
+    AddTaskFailure,
+    ResumeTaskResult,
+    resumeTask
 } from "../../src/service/task";
 import { TestTaskStorage } from "./test-task-storage";
 
@@ -127,6 +129,32 @@ describe("task-modify service", () => {
 
             expect(result).toBe(StopTaskResult.NotInRunning);
             expect(repo.save).not.toBeCalled();
+        });
+    });
+
+    describe("resume task", () => {
+        it("success if the task is stopped.", async () => {
+            const startTime = new Date();
+            const stopTime = new Date(startTime.getTime() + 1);
+            const resumeTime = new Date(startTime.getTime() + 2);
+
+            await startTask(id, startTime, repo);
+            await stopTask(id, stopTime, repo);
+            const result = await resumeTask(id, resumeTime, repo);
+
+            expect(result).toBe(ResumeTaskResult.Success);
+            expect(repo.save).toBeCalledTimes(3);
+        });
+
+        it("fail if the task is not stopped.", async () => {
+            const startTime = new Date();
+            const resumeTime = new Date(startTime.getTime() + 2);
+
+            await startTask(id, startTime, repo);
+            const result = await resumeTask(id, resumeTime, repo);
+
+            expect(result).toBe(ResumeTaskResult.NotStopped);
+            expect(repo.save).toBeCalledTimes(1);
         });
     });
 });

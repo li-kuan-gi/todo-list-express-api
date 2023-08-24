@@ -6,6 +6,7 @@ export class Task {
     private _expectDuration: number;
     private _startTime?: Date;
     private _stopTimes: Date[] = [];
+    private _resumeTimes: Date[] = [];
 
     /**
      * 
@@ -75,10 +76,19 @@ export class Task {
     }
 
     stop(time: Date): boolean {
-        if (!this._startTime || time <= this._startTime) {
+        if (!this._startTime || this._stopTimes.length !== this._resumeTimes.length) {
             return false;
         } else {
             this._stopTimes.push(time);
+            return true;
+        }
+    }
+
+    resume(time: Date): boolean {
+        if (!this._startTime || this._stopTimes.length !== this._resumeTimes.length + 1) {
+            return false;
+        } else {
+            this._resumeTimes.push(time);
             return true;
         }
     }
