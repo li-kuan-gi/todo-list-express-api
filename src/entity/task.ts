@@ -49,6 +49,22 @@ export class Task {
         return this._expectDuration;
     }
 
+    get startTime(): Date | undefined {
+        return this._startTime;
+    }
+
+    get completeTime(): Date | undefined {
+        return this._completeTime;
+    }
+
+    get stopTimes(): Date[] {
+        return this._stopTimes;
+    }
+
+    get resumeTimes(): Date[] {
+        return this._resumeTimes;
+    }
+
     get _lastOpTime(): Date | undefined {
         if (!this._startTime) {
             return undefined;
