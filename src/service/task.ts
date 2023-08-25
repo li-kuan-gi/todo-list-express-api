@@ -111,7 +111,6 @@ export async function completeTask(
 }
 
 export interface TaskRepository {
-    getTask(account: string, project: string, goal: string): Promise<Task | undefined>;
     getTaskByID(id: string): Promise<Task>;
     add(task: Task): Promise<string | undefined>;
     remove(id: string): Promise<void>;
