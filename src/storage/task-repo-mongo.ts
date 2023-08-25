@@ -1,6 +1,6 @@
-import { Db, MongoServerError } from "mongodb";
+import { Db, MongoServerError, ObjectId } from "mongodb";
 import { Task } from "../entity/task";
-import { TaskRepository } from "../service/task";
+import { TaskNotFound, TaskRepository } from "../service/task";
 import { config } from "../config";
 
 export class TaskRepoMongo implements TaskRepository {
@@ -38,9 +38,14 @@ export class TaskRepoMongo implements TaskRepository {
             }
         }
     }
-    remove(id: string): Promise<void> {
-        throw new Error("Method not implemented.");
+
+    async remove(id: string): Promise<void> {
+        const result = await this.db.collection(this.collName).deleteOne({ _id: new ObjectId(id) });
+        if (result.deletedCount === 0) {
+            throw new TaskNotFound();
+        }
     }
+
     save(task: Task): Promise<void> {
         throw new Error("Method not implemented.");
     }

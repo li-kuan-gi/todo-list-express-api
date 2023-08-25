@@ -2,6 +2,7 @@ import { Collection, Db, MongoClient } from "mongodb";
 import { config } from "../../src/config";
 import { Task } from "../../src/entity/task";
 import { TaskRepoMongo } from "../../src/storage/task-repo-mongo";
+import { TaskNotFound } from "../../src/service/task";
 
 let client: MongoClient;
 let db: Db;
@@ -43,5 +44,21 @@ describe("add task", () => {
         const result = await repo.add(task2);
 
         expect(typeof result).toBe("undefined");
+    });
+});
+
+describe("remove task", () => {
+    it("success if the task exists", async () => {
+        const repo = new TaskRepoMongo(db);
+        const task = new Task("acc", "pro", "goal", 1);
+        const id = await repo.add(task) as string;
+
+        expect(repo.remove(id)).resolves.toBe(undefined);
+    });
+
+    it("fail if the task not exists.", async () => {
+        const repo = new TaskRepoMongo(db);
+
+        expect(repo.remove("123456789123456789123456")).rejects.toBeInstanceOf(TaskNotFound);
     });
 });
