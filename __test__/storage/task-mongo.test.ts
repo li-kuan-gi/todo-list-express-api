@@ -97,3 +97,30 @@ describe("get task", () => {
         expect(taskDerived.resumeTimes).toStrictEqual([]);
     });
 });
+
+describe("save task", () => {
+    it("save changes to task", async () => {
+        const repo = new TaskRepoMongo(db);
+        const id = await repo.add(new Task("acc", "proj", "goal", 1)) as string;
+        const task = await repo.getTaskByID(id);
+        const duration = 10;
+        const startTime = new Date();
+        const stopTime = new Date(startTime.getTime() + 1);
+        const resumeTime = new Date(startTime.getTime() + 2);
+        const completeTime = new Date(startTime.getTime() + 3);
+
+        task.expect(duration);
+        task.start(startTime);
+        task.stop(stopTime);
+        task.resume(resumeTime);
+        task.complete(completeTime);
+        await repo.save(task);
+        const fetched = await repo.getTaskByID(id);
+
+        expect(fetched.expectDuration).toBe(task.expectDuration);
+        expect(fetched.startTime).toStrictEqual(task.startTime);
+        expect(fetched.stopTimes).toStrictEqual(task.stopTimes);
+        expect(fetched.resumeTimes).toStrictEqual(task.resumeTimes);
+        expect(fetched.completeTime).toStrictEqual(task.completeTime);
+    });
+});
