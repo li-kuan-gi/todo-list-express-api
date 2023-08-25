@@ -14,9 +14,27 @@ export class TaskRepoMongo implements TaskRepository {
     getTask(account: string, project: string, goal: string): Promise<Task | undefined> {
         throw new Error("Method not implemented.");
     }
-    getTaskByID(id: string): Promise<Task> {
-        throw new Error("Method not implemented.");
+
+    async getTaskByID(id: string): Promise<Task> {
+        const taskData = await this.db.collection(this.collName).findOne({ _id: new ObjectId(id) });
+
+        if (!taskData) throw new TaskNotFound();
+
+        const task = new Task(
+            taskData.account,
+            taskData.project,
+            taskData.goal,
+            taskData.expectDuration,
+            taskData._id.toString()
+        );
+        (task as any)._startTime = taskData.startTime || undefined;
+        (task as any)._completeTime = taskData.completeTime || undefined;
+        (task as any)._stopTimes = taskData.stopTimes;
+        (task as any)._resumeTimes = taskData.resumeTimes;
+
+        return task;
     }
+
     async add(task: Task): Promise<string | undefined> {
         try {
             const result = await this.db.collection(this.collName).insertOne({
@@ -24,8 +42,8 @@ export class TaskRepoMongo implements TaskRepository {
                 project: task.project,
                 goal: task.goal,
                 expectDuration: task.expectDuration,
-                startTime: task.startTime?.toISOString(),
-                completeTime: task.completeTime?.toISOString(),
+                startTime: task.startTime,
+                completeTime: task.completeTime,
                 stopTimes: task.stopTimes,
                 resumeTimes: task.resumeTimes
             });

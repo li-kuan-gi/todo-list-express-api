@@ -62,3 +62,38 @@ describe("remove task", () => {
         expect(repo.remove("123456789123456789123456")).rejects.toBeInstanceOf(TaskNotFound);
     });
 });
+
+describe("get task", () => {
+    it("whose constructor fields are filled.", async () => {
+        const repo = new TaskRepoMongo(db);
+        const account = "acc";
+        const project = "proj";
+        const goal = "goal";
+        const expectDuration = 1;
+
+        const id = await repo.add(new Task(account, project, goal, expectDuration)) as string;
+        const task = await repo.getTaskByID(id);
+
+        expect(task.account).toBe(account);
+        expect(task.project).toBe(project);
+        expect(task.goal).toBe(goal);
+        expect(task.expectDuration).toBe(expectDuration);
+    });
+
+    it("whose private fields are filled.", async () => {
+        const repo = new TaskRepoMongo(db);
+        const task = new Task("acc", "pro", "goal", 1);
+        const startTime = new Date();
+        const stopTime = new Date(startTime.getTime() + 1);
+        task.start(startTime);
+        task.stop(stopTime);
+
+        const id = await repo.add(task) as string;
+        const taskDerived = await repo.getTaskByID(id);
+
+        expect(taskDerived.startTime).toStrictEqual(startTime);
+        expect(taskDerived.completeTime).toStrictEqual(undefined);
+        expect(taskDerived.stopTimes).toStrictEqual([stopTime]);
+        expect(taskDerived.resumeTimes).toStrictEqual([]);
+    });
+});
