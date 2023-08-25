@@ -10,7 +10,7 @@ export class TestTaskStorage implements TaskRepository {
     }
 
     async getTaskByID(id: string): Promise<Task> {
-        const result = this.tasks.find(t => t.id === id);
+        const result = this.tasks.find(t => t.tid === id);
         if (!result) {
             throw new TaskNotFound();
         } else {
@@ -23,7 +23,7 @@ export class TestTaskStorage implements TaskRepository {
 
         if (!result) {
             const id = `${this.tasks.length}`;
-            (task as any).id = id;
+            (task as any).tid = id;
             this.tasks.push(task);
             return id;
         } else {
@@ -32,7 +32,7 @@ export class TestTaskStorage implements TaskRepository {
     }
 
     async remove(id: string): Promise<void> {
-        const result = this.tasks.findIndex(t => t.id === id);
+        const result = this.tasks.findIndex(t => t.tid === id);
 
         if (result === -1) {
             throw new TaskNotFound();

@@ -1,5 +1,5 @@
 export class Task {
-    public readonly id: string | undefined;
+    public readonly tid: string | undefined;
     private _account: string;
     private _project: string;
     private _goal: string;
@@ -26,7 +26,7 @@ export class Task {
         if (expectDuration <= 0) {
             throw new Error("expect time should be a positive number.");
         }
-        this.id = id;
+        this.tid = id;
         this._account = account;
         this._project = project;
         this._goal = goal;
