@@ -3,15 +3,15 @@ import { config } from "../../src/config";
 import { Task } from "../../src/entity/task";
 import { TaskRepoMongo } from "../../src/storage/task-repo-mongo";
 import { TaskInfo, TaskNotFound } from "../../src/service/task";
-import { info } from "console";
 import { TaskViewMongo } from "../../src/storage/task-view-mongo";
+import { testConfig } from "../test-config";
 
 let client: MongoClient;
 let db: Db;
 let coll: Collection;
 
 beforeAll(async () => {
-    const uri = process.env.MONGODB_TEST_URI as string;
+    const uri = testConfig.mongodbUri;
     client = await MongoClient.connect(uri);
     db = client.db("test-task-mongo");
     coll = db.collection(config.taskCollName);

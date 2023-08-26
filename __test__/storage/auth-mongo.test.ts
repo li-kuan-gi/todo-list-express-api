@@ -2,13 +2,14 @@ import { Db, MongoClient } from "mongodb";
 import { AuthRepoMongo } from "../../src/storage/auth-repo-mongo";
 import { AuthViewMongo } from "../../src/storage/auth-view-mongo";
 import { config } from "../../src/config";
+import { testConfig } from "../test-config";
 
 let client: MongoClient;
 let db: Db;
 const dbName = "test-auth-mongo";
 
 beforeAll(async () => {
-    const uri = process.env.MONGODB_TEST_URI as string;
+    const uri = testConfig.mongodbUri;
     client = await MongoClient.connect(uri);
     await client.db(dbName).dropDatabase();
     db = client.db(dbName);

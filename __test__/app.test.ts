@@ -3,13 +3,14 @@ import { config } from "../src/config";
 import { getMongoClient } from "../src/mongodb-client";
 import { app } from "../src/app";
 import { Server } from "http";
+import { testConfig } from "./test-config";
 
 let client: MongoClient;
 let db: Db;
 let server: Server;
 
 beforeAll(async () => {
-    config.mongodbUri = process.env.MONGODB_TEST_URI;
+    config.mongodbUri = testConfig.mongodbUri;
     client = await getMongoClient();
     await client.db(config.dbName).dropDatabase();
     db = client.db(config.dbName);
