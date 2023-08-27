@@ -1,113 +1,168 @@
 import { Task } from "../entity/task";
 
-/**
- * 
- * @param account 
- * @param project 
- * @param goal 
- * @param expectTime - the unit is "minute", e.g. for expectTime=3, it means "expect 3 minute"
- * @param repo 
- * @returns 
- */
-export async function addTask(
-    account: string,
-    project: string,
-    goal: string,
-    expectTime: number,
-    repo: TaskRepository
-): Promise<string | AddTaskFailure> {
-    if (expectTime <= 0) {
-        return AddTaskFailure.InvalidExpectDuration;
+export class AddTask {
+    private readonly repo: TaskRepository;
+
+    constructor(repo: TaskRepository) {
+        this.repo = repo;
     }
-    const task = new Task(account, project, goal, expectTime);
-    const id = await repo.add(task);
-    return id || AddTaskFailure.Duplicated;
-}
 
-export async function removeTask(
-    id: string,
-    repo: TaskRepository
-): Promise<void> {
-    await repo.remove(id);
-}
-
-export async function changeExpectDuration(
-    id: string,
-    duration: number,
-    repo: TaskRepository
-): Promise<ChangeExpectDurationResult> {
-    if (duration <= 0) {
-        return ChangeExpectDurationResult.InvalidDuration;
-    } else {
-        const task = await repo.getTaskByID(id);
-        task.expect(duration);
-        await repo.save(task);
-        return ChangeExpectDurationResult.Success;
+    /**
+     * 
+     * @param account 
+     * @param project 
+     * @param goal 
+     * @param duration - the unit is "minute", e.g. for duration=3, it means "expect 3 minute" 
+     * @returns 
+     */
+    async execute(
+        account: string,
+        project: string,
+        goal: string,
+        duration: number
+    ): Promise<string | AddTaskFailure> {
+        if (duration <= 0) {
+            return AddTaskFailure.InvalidExpectDuration;
+        }
+        const task = new Task(account, project, goal, duration);
+        const id = await this.repo.add(task);
+        return id || AddTaskFailure.Duplicated;
     }
 }
 
-export async function startTask(
-    id: string,
-    time: Date,
-    repo: TaskRepository
-): Promise<StartTaskResult> {
-    const task = await repo.getTaskByID(id);
+export enum AddTaskFailure {
+    Duplicated, InvalidExpectDuration
+}
 
-    const result = task.start(time);
+export class RemoveTask {
+    private readonly repo: TaskRepository;
 
-    if (result) {
-        await repo.save(task);
-        return StartTaskResult.Success;
-    } else {
-        return StartTaskResult.HasStarted;
+    constructor(repo: TaskRepository) {
+        this.repo = repo;
     }
-};
 
-export async function stopTask(
-    id: string,
-    time: Date,
-    repo: TaskRepository
-): Promise<StopTaskResult> {
-    const task = await repo.getTaskByID(id);
-
-    const result = task.stop(time);
-
-    if (result) {
-        await repo.save(task);
-        return StopTaskResult.Success;
-    } else {
-        return StopTaskResult.NotInRunning;
+    async execute(id: string): Promise<void> {
+        await this.repo.remove(id);
     }
 }
 
-export async function resumeTask(
-    id: string,
-    time: Date,
-    repo: TaskRepository
-): Promise<ResumeTaskResult> {
-    const task = await repo.getTaskByID(id);
-    const result = task.resume(time);
-    if (result) {
-        await repo.save(task);
-        return ResumeTaskResult.Success;
-    } else {
-        return ResumeTaskResult.NotStopped;
+export class ChangeExpectDuration {
+    private readonly repo: TaskRepository;
+
+    constructor(repo: TaskRepository) {
+        this.repo = repo;
+    }
+
+    async execute(id: string, duration: number): Promise<ChangeExpectDurationResult> {
+        if (duration <= 0) {
+            return ChangeExpectDurationResult.InvalidDuration;
+        } else {
+            const task = await this.repo.getTaskByID(id);
+            task.expect(duration);
+            await this.repo.save(task);
+            return ChangeExpectDurationResult.Success;
+        }
     }
 }
 
-export async function completeTask(
-    id: string,
-    time: Date,
-    repo: TaskRepository
-): Promise<CompleteTaskResult> {
-    const task = await repo.getTaskByID(id);
-    const result = task.complete(time);
-    if (result) {
-        await repo.save(task);
-        return CompleteTaskResult.Success;
-    } else {
-        return CompleteTaskResult.NotInRunning;
+export enum ChangeExpectDurationResult {
+    Success, InvalidDuration
+}
+
+export class StartTask {
+    private readonly repo;
+
+    constructor(repo: TaskRepository) {
+        this.repo = repo;
     }
+
+    async execute(id: string, time: Date): Promise<StartTaskResult> {
+        const task = await this.repo.getTaskByID(id);
+
+        const result = task.start(time);
+
+        if (result) {
+            await this.repo.save(task);
+            return StartTaskResult.Success;
+        } else {
+            return StartTaskResult.HasStarted;
+        }
+    }
+}
+
+export enum StartTaskResult {
+    Success, HasStarted
+}
+
+export class StopTask {
+    private readonly repo;
+
+    constructor(repo: TaskRepository) {
+        this.repo = repo;
+    }
+
+    async execute(id: string, time: Date): Promise<StopTaskResult> {
+        const task = await this.repo.getTaskByID(id);
+
+        const result = task.stop(time);
+
+        if (result) {
+            await this.repo.save(task);
+            return StopTaskResult.Success;
+        } else {
+            return StopTaskResult.NotInRunning;
+        }
+    }
+}
+
+export enum StopTaskResult {
+    Success, NotInRunning
+}
+
+export class ResumeTask {
+    private readonly repo;
+
+    constructor(repo: TaskRepository) {
+        this.repo = repo;
+    }
+
+    async execute(id: string, time: Date): Promise<ResumeTaskResult> {
+        const task = await this.repo.getTaskByID(id);
+        const result = task.resume(time);
+        if (result) {
+            await this.repo.save(task);
+            return ResumeTaskResult.Success;
+        } else {
+            return ResumeTaskResult.NotStopped;
+        }
+    }
+}
+
+export enum ResumeTaskResult {
+    Success, NotStopped
+}
+
+export class CompleteTask {
+    private readonly repo;
+
+    constructor(repo: TaskRepository) {
+        this.repo = repo;
+    }
+
+    async execute(id: string, time: Date): Promise<CompleteTaskResult> {
+        const task = await this.repo.getTaskByID(id);
+        const result = task.complete(time);
+        if (result) {
+            await this.repo.save(task);
+            return CompleteTaskResult.Success;
+        } else {
+            return CompleteTaskResult.NotInRunning;
+        }
+    }
+}
+
+export enum CompleteTaskResult {
+    Success, NotInRunning
 }
 
 export interface TaskRepository {
@@ -118,30 +173,6 @@ export interface TaskRepository {
 }
 
 export class TaskNotFound { }
-
-export enum AddTaskFailure {
-    Duplicated, InvalidExpectDuration
-}
-
-export enum ChangeExpectDurationResult {
-    Success, InvalidDuration
-}
-
-export enum StartTaskResult {
-    Success, HasStarted
-}
-
-export enum StopTaskResult {
-    Success, NotInRunning
-}
-
-export enum ResumeTaskResult {
-    Success, NotStopped
-}
-
-export enum CompleteTaskResult {
-    Success, NotInRunning
-}
 
 export interface TaskView {
     list(): Promise<TaskInfo[]>;

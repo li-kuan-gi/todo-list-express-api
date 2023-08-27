@@ -1,10 +1,10 @@
 import express from "express";
 import { sign as jwtSign } from "jsonwebtoken";
-import { signup, validate } from "./service/auth";
 import { getMongoClient } from "./mongodb-client";
 import { AuthRepoMongo } from "./storage/auth-repo-mongo";
 import { config } from "./config";
 import { AuthViewMongo } from "./storage/auth-view-mongo";
+import { Signup, ValidateSignin } from "./service/auth";
 
 const app = express();
 
@@ -24,8 +24,9 @@ app.post("/signup", async (req, res) => {
     try {
         const client = await getMongoClient();
         const repo = new AuthRepoMongo(client.db(config.dbName));
+        const signup = new Signup(repo);
 
-        const result = await signup(account, password, repo);
+        const result = await signup.execute(account, password);
 
         if (result) {
             res.status(200).json({});
@@ -51,8 +52,9 @@ app.post("/login", async (req, res) => {
     try {
         const client = await getMongoClient();
         const view = new AuthViewMongo(client.db(config.dbName));
+        const validate = new ValidateSignin(view);
 
-        const result = await validate(account, password, view);
+        const result = await validate.execute(account, password);
 
         if (result) {
             const token = jwtSign({ account }, config.jwtSecret, { expiresIn: '1m' });

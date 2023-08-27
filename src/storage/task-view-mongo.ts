@@ -1,5 +1,5 @@
 import { Collection, Db } from "mongodb";
-import { TaskInfo, TaskView, startTask } from "../service/task";
+import { TaskInfo, TaskView } from "../service/task";
 import { config } from "../config";
 
 export class TaskViewMongo implements TaskView {

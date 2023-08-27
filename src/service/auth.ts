@@ -1,26 +1,41 @@
 import bcrypt from "bcrypt";
 
-export const signup = async (account: string, password: string, repo: AuthRepository): Promise<boolean> => {
+export class Signup {
+    private readonly repo: AuthRepository;
 
-    const cipher = await bcrypt.hash(password, 10);
-    const result = await repo.addUser(account, cipher);
+    constructor(repo: AuthRepository) {
+        this.repo = repo;
+    }
 
-    return result;
-};
+    async execute(account: string, password: string): Promise<boolean> {
+        const cipher = await bcrypt.hash(password, 10);
+        const result = await this.repo.addUser(account, cipher);
+
+        return result;
+    }
+}
 
 export interface AuthRepository {
     addUser(account: string, password: string): Promise<boolean>;
 }
 
-export const validate = async (account: string, password: string, view: AuthView): Promise<boolean> => {
-    const cipher = await view.getPassword(account);
+export class ValidateSignin {
+    private readonly view: AuthView;
 
-    if (!cipher) {
-        return false;
-    } else {
-        return await bcrypt.compare(password, cipher);
+    constructor(view: AuthView) {
+        this.view = view;
     }
-};
+
+    async execute(account: string, password: string): Promise<boolean> {
+        const cipher = await this.view.getPassword(account);
+
+        if (!cipher) {
+            return false;
+        } else {
+            return await bcrypt.compare(password, cipher);
+        }
+    }
+}
 
 export interface AuthView {
     getPassword: (account: string) => Promise<string | undefined>;
