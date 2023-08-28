@@ -1,9 +1,9 @@
 import { Db, MongoClient } from "mongodb";
 import { config } from "../src/config";
-import { getMongoClient } from "../src/mongodb-client";
-import { app } from "../src/app";
+import { connectMongo, getMongoClient } from "../src/mongodb-client";
 import { Server } from "http";
 import { testConfig } from "./test-config";
+import { getApp } from "../src/app";
 
 let client: MongoClient;
 let db: Db;
@@ -11,11 +11,13 @@ let server: Server;
 
 beforeAll(async () => {
     config.mongodbUri = testConfig.mongodbUri;
-    client = await getMongoClient();
+    await connectMongo();
+    client = getMongoClient();
     await client.db(config.dbName).dropDatabase();
     db = client.db(config.dbName);
     await db.collection(config.userCollName).createIndex({ account: 1 }, { unique: true });
 
+    const app = getApp();
     server = app.listen(config.apiPort);
 });
 

@@ -1,6 +1,10 @@
 import bcrypt from "bcrypt";
 
-export class Signup {
+export interface ISignup {
+    execute(account: string, password: string): Promise<boolean>;
+}
+
+export class Signup implements ISignup {
     private readonly repo: AuthRepository;
 
     constructor(repo: AuthRepository) {
