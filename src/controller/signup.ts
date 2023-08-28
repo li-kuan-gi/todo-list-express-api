@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { ISignup } from "../service/auth";
+import { isString } from "../helper";
 
 export const getSignupController = (signup: ISignup) => async (req: Request, res: Response) => {
     const reqAccount = req.body.account;
@@ -24,7 +25,3 @@ export const getSignupController = (signup: ISignup) => async (req: Request, res
         res.status(500).json({});
     }
 };
-
-function isString(a: any): boolean {
-    return typeof a === "string";
-}
