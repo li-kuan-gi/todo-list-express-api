@@ -1,17 +1,16 @@
-import { Db, MongoServerError } from "mongodb";
+import { Collection, Db, MongoServerError } from "mongodb";
 import { AuthRepository } from "../service/auth";
-import { config } from "../config";
 
 export class AuthRepoMongo implements AuthRepository {
-    private readonly db: Db;
+    private readonly collection: Collection;
 
-    constructor(db: Db) {
-        this.db = db;
+    constructor(db: Db, userCollName: string) {
+        this.collection = db.collection(userCollName);
     }
 
     async addUser(account: string, password: string): Promise<boolean> {
         try {
-            await this.db.collection(config.userCollName).insertOne({ account, password });
+            await this.collection.insertOne({ account, password });
             return true;
         } catch (e) {
             if (e instanceof MongoServerError && e.message.includes("duplicate")) {

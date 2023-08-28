@@ -1,18 +1,37 @@
-import { config } from "./config";
-import { getMongoClient } from "./mongodb-client";
-import { Signup, ValidateLogin } from "./service/auth";
+import { ISignup, IValidateLogin, Signup, ValidateLogin } from "./service/auth";
 import { AuthRepoMongo } from "./storage/auth-repo-mongo";
 import { AuthViewMongo } from "./storage/auth-view-mongo";
+import { MongoClientManager } from "./storage/mongo-client-manager";
 
-export const container = {
-    getSignupService: () => {
-        const client = getMongoClient();
-        const repo = new AuthRepoMongo(client.db(config.dbName));
+export class DependencyContainer {
+    private manager: MongoClientManager;
+    private config: ContainerConfig;
+
+    constructor(config: ContainerConfig) {
+        this.config = config;
+        this.manager = new MongoClientManager(config.mongodbUri);
+    }
+
+    async setup() {
+        await this.manager.connect();
+    }
+
+    getSignupService(): ISignup {
+        const db = this.manager.getMongoClient().db(this.config.dbName);
+        const repo = new AuthRepoMongo(db, this.config.userCollName);
         return new Signup(repo);
-    },
-    getValidateLoginService: () => {
-        const client = getMongoClient();
-        const view = new AuthViewMongo(client.db(config.dbName));
+    }
+
+    getValidateLoginService(): IValidateLogin {
+        const db = this.manager.getMongoClient().db(this.config.dbName);
+        const view = new AuthViewMongo(db, this.config.userCollName);
         return new ValidateLogin(view);
     }
-};
+}
+
+export interface ContainerConfig {
+    mongodbUri: string;
+    dbName: string;
+    userCollName: string;
+    taskCollName: string;
+}

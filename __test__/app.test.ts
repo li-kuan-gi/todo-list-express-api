@@ -1,24 +1,27 @@
 import { Db, MongoClient } from "mongodb";
-import { config } from "../src/config";
-import { connectMongo, getMongoClient } from "../src/mongodb-client";
 import { Server } from "http";
 import { testConfig } from "./test-config";
-import { getApp } from "../src/app";
+import { App, AppConfig } from "../src/app";
+import { configureDB } from "./configure-db";
 
 let client: MongoClient;
 let db: Db;
 let server: Server;
+let config: AppConfig;
+let port: number;
 
 beforeAll(async () => {
-    config.mongodbUri = testConfig.mongodbUri;
-    await connectMongo();
-    client = getMongoClient();
-    await client.db(config.dbName).dropDatabase();
-    db = client.db(config.dbName);
-    await db.collection(config.userCollName).createIndex({ account: 1 }, { unique: true });
+    config = testConfig;
+    const app = new App(config);
+    await app.setup();
 
-    const app = getApp();
-    server = app.listen(config.apiPort);
+    // To configure db, illegally get mongo client
+    client = (app as any).container.manager.getMongoClient();
+    await configureDB(client, config);
+    db = client.db(config.dbName);
+
+    port = 3001;
+    server = app.listen(port);
 });
 
 beforeEach(async () => {
@@ -131,7 +134,7 @@ function postSignup(account: string | undefined, password: string | undefined): 
     if (account !== undefined) payload["account"] = account;
     if (password !== undefined) payload["password"] = password;
 
-    return fetch(`http://localhost:${config.apiPort}/signup`, {
+    return fetch(`http://localhost:${port}/signup`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -145,7 +148,7 @@ function postLogin(account: string | undefined, password: string | undefined): P
     if (account !== undefined) payload["account"] = account;
     if (password !== undefined) payload["password"] = password;
 
-    return fetch(`http://localhost:${config.apiPort}/login`, {
+    return fetch(`http://localhost:${port}/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

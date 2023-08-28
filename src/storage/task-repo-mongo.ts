@@ -2,7 +2,6 @@ import { Collection, Db, MongoServerError, ObjectId } from "mongodb";
 import { Task } from "../entity/task";
 import { TaskNotFound, TaskRepository } from "../service/task";
 import { config } from "../config";
-import { DefaultSerializer } from "v8";
 
 export class TaskRepoMongo implements TaskRepository {
     private readonly db: Db;

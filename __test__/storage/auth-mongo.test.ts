@@ -1,26 +1,31 @@
 import { Db, MongoClient } from "mongodb";
 import { AuthRepoMongo } from "../../src/storage/auth-repo-mongo";
 import { AuthViewMongo } from "../../src/storage/auth-view-mongo";
-import { config } from "../../src/config";
 import { testConfig } from "../test-config";
+import { AuthRepository, AuthView } from "../../src/service/auth";
 
 let client: MongoClient;
 let db: Db;
 const dbName = "test-auth-mongo";
+let userCollName = "test-user";
+let repo: AuthRepository;
+let view: AuthView;
 
 beforeAll(async () => {
     const uri = testConfig.mongodbUri;
     client = await MongoClient.connect(uri);
-    await client.db(dbName).dropDatabase();
     db = client.db(dbName);
+    await db.dropDatabase();
 });
 
 beforeEach(async () => {
-    await db.collection(config.userCollName).createIndex({ account: 1 }, { unique: true });
+    await db.collection(userCollName).createIndex({ account: 1 }, { unique: true });
+    repo = new AuthRepoMongo(db, userCollName);
+    view = new AuthViewMongo(db, userCollName);
 });
 
 afterEach(async () => {
-    await client.db(dbName).dropCollection("user");
+    await client.db(dbName).dropCollection(userCollName);
 });
 
 afterAll(async () => {
@@ -30,7 +35,6 @@ afterAll(async () => {
 
 describe("AuthRepoMongo", () => {
     it("return true if no same account.", async () => {
-        const repo = new AuthRepoMongo(db);
         const account = "test-account";
         const password = "test-password";
 
@@ -40,7 +44,6 @@ describe("AuthRepoMongo", () => {
     });
 
     it("return false if same account exist.", async () => {
-        const repo = new AuthRepoMongo(db);
         const account = "test-account";
         const password = "test-password";
 
@@ -55,7 +58,6 @@ describe("AuthView", () => {
     it("return undefined if the account does not exist.", async () => {
         const account = "test-account";
         const password = "test-password";
-        const view = new AuthViewMongo(db);
 
         const result = await view.getPassword(account);
 
@@ -65,8 +67,7 @@ describe("AuthView", () => {
     it("return password if the account exists.", async () => {
         const account = "test-account";
         const password = "test-password";
-        new AuthRepoMongo(db).addUser(account, password);
-        const view = new AuthViewMongo(db);
+        repo.addUser(account, password);
 
         const result = await view.getPassword(account);
 

@@ -1,8 +1,9 @@
-export const config = {
-    mongodbUri: process.env.MONGODB_URI,
+import { AppConfig } from "./app";
+
+export const config: AppConfig = {
+    mongodbUri: process.env.MONGODB_URI as string,
     dbName: "todo-list",
     userCollName: "user",
     taskCollName: "task",
-    apiPort: 3001,
     jwtSecret: "jwt-secret-example"
 };

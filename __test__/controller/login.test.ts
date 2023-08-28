@@ -5,6 +5,8 @@ import { getLoginController } from "../../src/controller/login";
 let req: Request;
 let res: Response;
 let validate: IValidateLogin;
+let jwtSecret = "secret";
+let controller: (req: Request, res: Response) => any;
 
 beforeEach(() => {
     req = {} as Request;
@@ -13,19 +15,18 @@ beforeEach(() => {
         json: jest.fn().mockReturnThis()
     } as unknown as Response;
     validate = new FakeValidateLogin();
+    controller = getLoginController(validate, jwtSecret);
 });
 
 describe("login controller", () => {
     it("return status 200 if login success.", async () => {
         req.body = { account: "test", password: "valid" };
-        const controller = getLoginController(validate);
         await controller(req, res);
         expect(res.status).toBeCalledWith(200);
     });
 
     it("return status 401 if data is wrong.", async () => {
         req.body = { account: "test", password: "invalid" };
-        const controller = getLoginController(validate);
         await controller(req, res);
         expect(res.status).toBeCalledWith(401);
     });

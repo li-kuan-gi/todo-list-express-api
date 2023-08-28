@@ -1,16 +1,40 @@
-import express from "express";
+import express, { Express } from "express";
 import { getSignupController } from "./controller/signup";
-import { container } from "./container";
+import { ContainerConfig, DependencyContainer } from "./container";
 import { getLoginController } from "./controller/login";
+import { Server } from "http";
 
-export const getApp = () => {
-    const app = express();
+export class App {
+    private readonly config: AppConfig;
+    private container: DependencyContainer;
+    private app: Express;
 
-    app.use(express.json());
+    constructor(config: AppConfig) {
+        this.config = config;
+        this.container = new DependencyContainer(config);
+        this.app = express();
+    }
 
-    app.post("/signup", getSignupController(container.getSignupService()));
+    async setup() {
+        await this.container.setup();
 
-    app.post("/login", getLoginController(container.getValidateLoginService()));
+        this.app.use(express.json());
 
-    return app;
-};
+        this.app.post("/signup", getSignupController(
+            this.container.getSignupService()
+        ));
+
+        this.app.post("/login", getLoginController(
+            this.container.getValidateLoginService(),
+            this.config.jwtSecret
+        ));
+    }
+
+    listen(port: number, cb?: () => void): Server {
+        return this.app.listen(port, cb);
+    }
+}
+
+export interface AppConfig extends ContainerConfig {
+    jwtSecret: string;
+}

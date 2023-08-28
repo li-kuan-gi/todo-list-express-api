@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as jwt from "jsonwebtoken";
-import { config } from "../config";
 
-export const jwtValidate = async (req: Request, res: Response, next: NextFunction) => {
+export const getJwtValidateMiddleware = (jwtSecret: string) => async (req: Request, res: Response, next: NextFunction) => {
     const token = getJWTFromHeaders(req.headers);
 
     if (!token) {
@@ -12,7 +11,7 @@ export const jwtValidate = async (req: Request, res: Response, next: NextFunctio
 
     try {
         const decoded = await new Promise((resolve, reject) =>
-            jwt.verify(token, config.jwtSecret, (error, decoded) =>
+            jwt.verify(token, jwtSecret, (error, decoded) =>
                 error ? reject(error) : resolve(decoded)
             )
         );
