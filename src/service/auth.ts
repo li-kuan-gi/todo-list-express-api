@@ -23,7 +23,11 @@ export interface AuthRepository {
     addUser(account: string, password: string): Promise<boolean>;
 }
 
-export class ValidateSignin {
+export interface IValidateLogin {
+    execute(account: string, password: string): Promise<boolean>;
+}
+
+export class ValidateLogin implements IValidateLogin {
     private readonly view: AuthView;
 
     constructor(view: AuthView) {

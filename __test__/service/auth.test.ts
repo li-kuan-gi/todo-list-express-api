@@ -1,4 +1,4 @@
-import { AuthRepository, AuthView, Signup, ValidateSignin } from "../../src/service/auth";
+import { AuthRepository, AuthView, Signup, ValidateLogin } from "../../src/service/auth";
 
 let account: string;
 let password: string;
@@ -34,23 +34,23 @@ describe("sign up", () => {
 
 describe("validate", () => {
     let signup: Signup;
-    let validateSignin: ValidateSignin;
+    let validateLogin: ValidateLogin;
 
     beforeEach(() => {
         const repo: AuthRepository = storage;
         const view: AuthView = storage;
         signup = new Signup(repo);
-        validateSignin = new ValidateSignin(view);
+        validateLogin = new ValidateLogin(view);
     });
     it("success if account exists and password is correct.", async () => {
         await signup.execute(account, password);
-        const result = await validateSignin.execute(account, password);
+        const result = await validateLogin.execute(account, password);
 
         expect(result).toBeTruthy();
     });
 
     it("fail if no account.", async () => {
-        const result = await validateSignin.execute(account, password);
+        const result = await validateLogin.execute(account, password);
 
         expect(result).toBeFalsy();
     });
@@ -61,7 +61,7 @@ describe("validate", () => {
         const wrongPassword = "wrong";
         const view: AuthView = storage;
 
-        const result = await validateSignin.execute(account, wrongPassword);
+        const result = await validateLogin.execute(account, wrongPassword);
 
         expect(result).toBeFalsy();
     });
