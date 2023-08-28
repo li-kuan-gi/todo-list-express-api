@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { JsonWebTokenError, JwtPayload, verify as jwtVerify } from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 import { config } from "../config";
 
 export const jwtValidate = async (req: Request, res: Response, next: NextFunction) => {
@@ -12,14 +12,14 @@ export const jwtValidate = async (req: Request, res: Response, next: NextFunctio
 
     try {
         const decoded = await new Promise((resolve, reject) =>
-            jwtVerify(token, config.jwtSecret, (error, decoded) =>
+            jwt.verify(token, config.jwtSecret, (error, decoded) =>
                 error ? reject(error) : resolve(decoded)
             )
         );
-        req.body.account = (decoded as JwtPayload).account;
+        req.body.account = (decoded as jwt.JwtPayload).account;
         next();
     } catch (error) {
-        if (error instanceof JsonWebTokenError) {
+        if (error instanceof jwt.JsonWebTokenError) {
             res.status(401);
 
             if (error.message.includes("signature")) {

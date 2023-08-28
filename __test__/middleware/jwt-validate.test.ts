@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { sign as jwtSign } from "jsonwebtoken";
-import { jwtValidate } from "../../src/middleware/jwt-validate";
+import * as jwt from "jsonwebtoken";
 import { config } from "../../src/config";
+import { jwtValidate } from "../../src/middleware/jwt-validate";
 
 let account: string;
 let res: Response;
@@ -15,8 +15,8 @@ beforeEach(() => {
 
 describe("jwt validate", () => {
     it("pass if the token is valid.", async () => {
-        const jwt = jwtSign({ account }, config.jwtSecret);
-        const req = getReqWithJWT(jwt);
+        const token = jwt.sign({ account }, config.jwtSecret);
+        const req = getReqWithJWT(token);
 
         await jwtValidate(req, res, next);
 
@@ -25,8 +25,8 @@ describe("jwt validate", () => {
     });
 
     it("reject if the token has invalid signature.", async () => {
-        const jwt = jwtSign({ account }, "wrong secret");
-        const req = getReqWithJWT(jwt);
+        const token = jwt.sign({ account }, "wrong secret");
+        const req = getReqWithJWT(token);
 
         await jwtValidate(req, res, next);
 
@@ -36,8 +36,8 @@ describe("jwt validate", () => {
     });
 
     it("reject if the token has expired.", async () => {
-        const jwt = jwtSign({ account }, config.jwtSecret, { expiresIn: "1ms" });
-        const req = getReqWithJWT(jwt);
+        const token = jwt.sign({ account }, config.jwtSecret, { expiresIn: "1ms" });
+        const req = getReqWithJWT(token);
 
         await sleep(2);
         await jwtValidate(req, res, next);
@@ -48,8 +48,8 @@ describe("jwt validate", () => {
     });
 
     it("reject if the format of authorization in header is wrong.", async () => {
-        const jwt = jwtSign({ account }, config.jwtSecret);
-        const req = { headers: { authorization: `${jwt}` }, body: {} } as Request;
+        const token = jwt.sign({ account }, config.jwtSecret);
+        const req = { headers: { authorization: `${token}` }, body: {} } as Request;
 
         await jwtValidate(req, res, next);
 
@@ -59,9 +59,9 @@ describe("jwt validate", () => {
     });
 });
 
-function getReqWithJWT(jwt: string): Request {
+function getReqWithJWT(token: string): Request {
     return {
-        headers: { authorization: `Bearer ${jwt}` },
+        headers: { authorization: `Bearer ${token}` },
         body: {}
     } as Request;
 }

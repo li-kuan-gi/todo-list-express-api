@@ -1,5 +1,5 @@
 import express from "express";
-import { sign as jwtSign } from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 import { getMongoClient } from "./mongodb-client";
 import { AuthRepoMongo } from "./storage/auth-repo-mongo";
 import { config } from "./config";
@@ -57,7 +57,7 @@ app.post("/login", async (req, res) => {
         const result = await validate.execute(account, password);
 
         if (result) {
-            const token = jwtSign({ account }, config.jwtSecret, { expiresIn: '1m' });
+            const token = jwt.sign({ account }, config.jwtSecret, { expiresIn: '1m' });
             return res.status(200).json({ token });
         } else {
             return res.status(401).json({ msg: "account or password is incorrect." });
