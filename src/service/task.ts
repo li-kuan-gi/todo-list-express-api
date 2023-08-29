@@ -172,8 +172,6 @@ export interface TaskRepository {
     save(task: Task): Promise<void>;
 }
 
-export class TaskNotFound { }
-
 export interface TaskView {
     list(): Promise<TaskInfo[]>;
 }

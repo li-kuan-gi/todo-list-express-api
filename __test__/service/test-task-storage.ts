@@ -1,5 +1,6 @@
 import { Task } from "../../src/entity/task";
-import { TaskNotFound, TaskRepository } from "../../src/service/task";
+import { TaskRepository } from "../../src/service/task";
+import { TaskNotFound } from "../../src/storage/task/error";
 
 export class TestTaskStorage implements TaskRepository {
     private readonly tasks: Task[] = [];

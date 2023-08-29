@@ -1,9 +1,10 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import { Task } from "../../src/entity/task";
-import { TaskRepoMongo } from "../../src/storage/task-repo-mongo";
-import { TaskInfo, TaskNotFound, TaskRepository, TaskView } from "../../src/service/task";
-import { TaskViewMongo } from "../../src/storage/task-view-mongo";
+import { TaskRepoMongo } from "../../src/storage/task/task-repo-mongo";
+import { TaskInfo, TaskRepository, TaskView } from "../../src/service/task";
 import { testConfig } from "../test-config";
+import { TaskNotFound } from "../../src/storage/task/error";
+import { TaskViewMongo } from "../../src/storage/task/task-view-mongo";
 
 let client: MongoClient;
 let db: Db;

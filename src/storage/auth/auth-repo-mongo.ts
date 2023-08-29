@@ -1,5 +1,5 @@
 import { Collection, Db, MongoServerError } from "mongodb";
-import { AuthRepository } from "../service/auth";
+import { AuthRepository } from "../../service/auth";
 
 export class AuthRepoMongo implements AuthRepository {
     private readonly collection: Collection;

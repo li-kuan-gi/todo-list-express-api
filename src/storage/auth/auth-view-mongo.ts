@@ -1,5 +1,5 @@
 import { Collection, Db } from "mongodb";
-import { AuthView } from "../service/auth";
+import { AuthView } from "../../service/auth";
 
 export class AuthViewMongo implements AuthView {
     private readonly collection: Collection;

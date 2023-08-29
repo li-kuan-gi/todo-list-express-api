@@ -1,6 +1,6 @@
 import { ISignup, IValidateLogin, Signup, ValidateLogin } from "./service/auth";
-import { AuthRepoMongo } from "./storage/auth-repo-mongo";
-import { AuthViewMongo } from "./storage/auth-view-mongo";
+import { AuthRepoMongo } from "./storage/auth/auth-repo-mongo";
+import { AuthViewMongo } from "./storage/auth/auth-view-mongo";
 import { MongoClientManager } from "./storage/mongo-client-manager";
 
 export class DependencyContainer {
