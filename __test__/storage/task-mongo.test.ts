@@ -1,20 +1,20 @@
 import { Collection, Db, MongoClient } from "mongodb";
-import { config } from "../../src/config";
 import { Task } from "../../src/entity/task";
 import { TaskRepoMongo } from "../../src/storage/task-repo-mongo";
-import { TaskInfo, TaskNotFound } from "../../src/service/task";
+import { TaskInfo, TaskNotFound, TaskRepository, TaskView } from "../../src/service/task";
 import { TaskViewMongo } from "../../src/storage/task-view-mongo";
 import { testConfig } from "../test-config";
 
 let client: MongoClient;
 let db: Db;
 let coll: Collection;
+const taskCollName = "test-task-coll";
 
 beforeAll(async () => {
     const uri = testConfig.mongodbUri;
     client = await MongoClient.connect(uri);
     db = client.db("test-task-mongo");
-    coll = db.collection(config.taskCollName);
+    coll = db.collection(taskCollName);
     await coll.createIndex({ account: 1, project: 1, goal: 1 }, { unique: true });
 });
 
@@ -28,9 +28,14 @@ afterAll(async () => {
 });
 
 describe("task repo", () => {
+    let repo: TaskRepository;
+
+    beforeEach(() => {
+        repo = new TaskRepoMongo(db, taskCollName);
+    });
+
     describe("add task", () => {
         it("success if no same task.", async () => {
-            const repo = new TaskRepoMongo(db);
             const task = new Task("acc", "pro", "goal", 1);
 
             const result = await repo.add(task);
@@ -39,7 +44,6 @@ describe("task repo", () => {
         });
 
         it("fail if same task has existed.", async () => {
-            const repo = new TaskRepoMongo(db);
             const task1 = new Task("acc", "pro", "goal", 1);
             const task2 = new Task("acc", "pro", "goal", 2);
 
@@ -52,7 +56,6 @@ describe("task repo", () => {
 
     describe("remove task", () => {
         it("success if the task exists", async () => {
-            const repo = new TaskRepoMongo(db);
             const task = new Task("acc", "pro", "goal", 1);
             const id = await repo.add(task) as string;
 
@@ -60,15 +63,12 @@ describe("task repo", () => {
         });
 
         it("fail if the task not exists.", async () => {
-            const repo = new TaskRepoMongo(db);
-
             expect(repo.remove("123456789123456789123456")).rejects.toBeInstanceOf(TaskNotFound);
         });
     });
 
     describe("get task", () => {
         it("whose constructor fields are filled.", async () => {
-            const repo = new TaskRepoMongo(db);
             const account = "acc";
             const project = "proj";
             const goal = "goal";
@@ -84,7 +84,6 @@ describe("task repo", () => {
         });
 
         it("whose private fields are filled.", async () => {
-            const repo = new TaskRepoMongo(db);
             const task = new Task("acc", "pro", "goal", 1);
             const startTime = new Date();
             const stopTime = new Date(startTime.getTime() + 1);
@@ -103,7 +102,6 @@ describe("task repo", () => {
 
     describe("save task", () => {
         it("save changes to task", async () => {
-            const repo = new TaskRepoMongo(db);
             const id = await repo.add(new Task("acc", "proj", "goal", 1)) as string;
             const task = await repo.getTaskByID(id);
             const duration = 10;
@@ -130,10 +128,16 @@ describe("task repo", () => {
 });
 
 describe("task view", () => {
+    let repo: TaskRepository;
+    let view: TaskView;
+
+    beforeEach(() => {
+        repo = new TaskRepoMongo(db, taskCollName);
+        view = new TaskViewMongo(db, taskCollName);
+    });
+
     describe("list", () => {
         it("list all task", async () => {
-            const repo = new TaskRepoMongo(db);
-            const view = new TaskViewMongo(db);
             const startTime = new Date();
             const info1: TaskInfo = {
                 tid: "1",

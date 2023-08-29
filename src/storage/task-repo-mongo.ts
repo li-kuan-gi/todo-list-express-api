@@ -1,18 +1,16 @@
 import { Collection, Db, MongoServerError, ObjectId } from "mongodb";
 import { Task } from "../entity/task";
 import { TaskNotFound, TaskRepository } from "../service/task";
-import { config } from "../config";
 
 export class TaskRepoMongo implements TaskRepository {
-    private readonly db: Db;
-    private readonly collName = config.taskCollName;
+    private readonly coll: Collection;
 
-    constructor(db: Db) {
-        this.db = db;
+    constructor(db: Db, taskCollName: string) {
+        this.coll = db.collection(taskCollName);
     }
 
     async getTaskByID(id: string): Promise<Task> {
-        const taskData = await this.db.collection(this.collName).findOne({ _id: new ObjectId(id) });
+        const taskData = await this.coll.findOne({ _id: new ObjectId(id) });
 
         if (!taskData) throw new TaskNotFound();
 
@@ -33,7 +31,7 @@ export class TaskRepoMongo implements TaskRepository {
 
     async add(task: Task): Promise<string | undefined> {
         try {
-            const result = await this.db.collection(this.collName).insertOne({
+            const result = await this.coll.insertOne({
                 account: task.account,
                 project: task.project,
                 goal: task.goal,
@@ -54,15 +52,14 @@ export class TaskRepoMongo implements TaskRepository {
     }
 
     async remove(id: string): Promise<void> {
-        const result = await this.db.collection(this.collName).deleteOne({ _id: new ObjectId(id) });
+        const result = await this.coll.deleteOne({ _id: new ObjectId(id) });
         if (result.deletedCount === 0) {
             throw new TaskNotFound();
         }
     }
 
     async save(task: Task): Promise<void> {
-        const coll = this.db.collection(this.collName);
-        await (task as TaskMongo).save(coll);
+        await (task as TaskMongo).save(this.coll);
     }
 }
 

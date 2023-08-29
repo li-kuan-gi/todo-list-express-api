@@ -1,12 +1,11 @@
 import { Collection, Db } from "mongodb";
 import { TaskInfo, TaskView } from "../service/task";
-import { config } from "../config";
 
 export class TaskViewMongo implements TaskView {
-    private coll: Collection;
+    private readonly coll: Collection;
 
-    constructor(db: Db) {
-        this.coll = db.collection(config.taskCollName);
+    constructor(db: Db, taskCollName: string) {
+        this.coll = db.collection(taskCollName);
     }
 
     async list(): Promise<TaskInfo[]> {
