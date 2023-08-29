@@ -1,8 +1,7 @@
 import { Db, MongoClient } from "mongodb";
-import { AuthRepoMongo } from "../../src/storage/auth/auth-repo-mongo";
 import { testConfig } from "../test-config";
-import { AuthRepository, AuthView } from "../../src/service/auth";
-import { AuthViewMongo } from "../../src/storage/auth/auth-view-mongo";
+import { AuthRepository, AuthView } from "@auth/service";
+import { AuthRepoMongo, AuthViewMongo } from "@auth/storage";
 
 let client: MongoClient;
 let db: Db;

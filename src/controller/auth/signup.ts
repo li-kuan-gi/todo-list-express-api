@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { ISignup } from "../service/auth";
-import { isString } from "../helper";
+import { ISignup } from "@auth/service";
+import { isString } from "@src/helper";
 
 export const getSignupController = (signup: ISignup) => async (req: Request, res: Response) => {
     const reqAccount = req.body.account;

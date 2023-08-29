@@ -1,7 +1,7 @@
 import { App } from "./app";
 import { config } from "./config";
 
-const port = 3001;
+const port = Number(process.env.API_PORT);
 
 (async () => {
     const app = new App(config);

@@ -1,3 +1,5 @@
+import { TimeReverse } from "./time-reverse";
+
 export class Task {
     public readonly tid: string | undefined;
     private _account: string;
@@ -143,5 +145,3 @@ export class Task {
         }
     }
 }
-
-export class TimeReverse { }

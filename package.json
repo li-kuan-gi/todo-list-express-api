@@ -4,7 +4,7 @@
   "description": "Created for fast iteration of work",
   "main": "index.js",
   "scripts": {
-    "build": "tsc --build tsconfig-build.json",
+    "build": "tsc --project tsconfig-build.json && tsc-alias -p tsconfig-build.json",
     "start": "node ./dist/index.js",
     "test": "jest"
   },
@@ -19,6 +19,7 @@
     "jest": "^29.6.2",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.7",
     "typescript": "^5.1.6"
   },
   "dependencies": {

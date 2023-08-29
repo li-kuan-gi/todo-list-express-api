@@ -1,5 +1,5 @@
 import { Collection, Db } from "mongodb";
-import { TaskInfo, TaskView } from "../../service/task";
+import { TaskInfo, TaskView } from "@task/service";
 
 export class TaskViewMongo implements TaskView {
     private readonly coll: Collection;

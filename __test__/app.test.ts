@@ -1,14 +1,14 @@
 import { Db, MongoClient } from "mongodb";
 import { Server } from "http";
+import { App, AppConfig } from "@src/app";
 import { testConfig } from "./test-config";
-import { App, AppConfig } from "../src/app";
 import { configureDB } from "./configure-db";
 
 let client: MongoClient;
 let db: Db;
 let server: Server;
 let config: AppConfig;
-let port: number;
+let port: number = Number(process.env.TEST_API_PORT);
 
 beforeAll(async () => {
     config = testConfig;
@@ -20,7 +20,6 @@ beforeAll(async () => {
     await configureDB(client, config);
     db = client.db(config.dbName);
 
-    port = 3001;
     server = app.listen(port);
 });
 

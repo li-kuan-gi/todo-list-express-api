@@ -1,7 +1,7 @@
 import { Collection, Db, MongoServerError, ObjectId } from "mongodb";
-import { Task } from "../../entity/task";
-import { TaskRepository } from "../../service/task";
 import { TaskNotFound } from "./error";
+import { TaskRepository } from "@task/service";
+import { Task } from "@task/domain";
 
 export class TaskRepoMongo implements TaskRepository {
     private readonly coll: Collection;

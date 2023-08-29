@@ -1,8 +1,7 @@
 import express, { Express } from "express";
-import { getSignupController } from "./controller/signup";
-import { ContainerConfig, DependencyContainer } from "./container";
-import { getLoginController } from "./controller/login";
 import { Server } from "http";
+import { ContainerConfig, DependencyContainer } from "./container";
+import { getLoginController, getSignupController } from "./controller";
 
 export class App {
     private readonly config: AppConfig;

@@ -1,4 +1,4 @@
-import { AuthRepository, AuthView, Signup, ValidateLogin } from "../../src/service/auth";
+import { AuthRepository, AuthView, Signup, ValidateLogin } from "@auth/service";
 
 let account: string;
 let password: string;

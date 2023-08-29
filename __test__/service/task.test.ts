@@ -13,7 +13,7 @@ import {
     StopTask,
     ResumeTask,
     CompleteTask
-} from "../../src/service/task";
+} from "@task/service";
 import { TestTaskStorage } from "./test-task-storage";
 
 let id: string;

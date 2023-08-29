@@ -1,7 +1,7 @@
-import { ISignup, IValidateLogin, Signup, ValidateLogin } from "./service/auth";
-import { AuthRepoMongo } from "./storage/auth/auth-repo-mongo";
-import { AuthViewMongo } from "./storage/auth/auth-view-mongo";
-import { MongoClientManager } from "./storage/mongo-client-manager";
+import { ISignup, IValidateLogin, Signup, ValidateLogin } from "@auth/service";
+import { AuthRepoMongo, AuthViewMongo } from "@auth/storage";
+import { MongoClientManager } from "./mongo-client-manager";
+import { ContainerConfig } from "./container-config";
 
 export class DependencyContainer {
     private manager: MongoClientManager;
@@ -27,11 +27,4 @@ export class DependencyContainer {
         const view = new AuthViewMongo(db, this.config.userCollName);
         return new ValidateLogin(view);
     }
-}
-
-export interface ContainerConfig {
-    mongodbUri: string;
-    dbName: string;
-    userCollName: string;
-    taskCollName: string;
 }

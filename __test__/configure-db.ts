@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb";
-import { ContainerConfig } from "../src/container";
+import { ContainerConfig } from "@src/container";
 
 export async function configureDB(client: MongoClient, config: ContainerConfig) {
     const db = client.db(config.dbName);

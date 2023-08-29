@@ -1,5 +1,4 @@
-import { Task, TimeReverse } from "../../src/entity/task";
-import { start } from "repl";
+import { Task, TimeReverse } from "@task/domain";
 
 let task: Task;
 

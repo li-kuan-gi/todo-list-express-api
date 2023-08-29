@@ -1,6 +1,6 @@
+import { getJwtValidateMiddleware } from "@controller/auth";
 import { Request, Response, NextFunction } from "express";
 import * as jwt from "jsonwebtoken";
-import { getJwtValidateMiddleware } from "../../src/middleware/jwt-validate";
 
 let account: string;
 let res: Response;

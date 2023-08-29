@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import { isString } from "../helper";
-import { IValidateLogin } from "../service/auth";
+import { IValidateLogin } from "@auth/service";
+import { isString } from "@src/helper";
 
 export const getLoginController = (validate: IValidateLogin, jwtSecret: string) => async (req: Request, res: Response) => {
     const reqAccount = req.body.account;
