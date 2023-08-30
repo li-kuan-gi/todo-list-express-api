@@ -19,14 +19,9 @@ export class App {
 
         this.app.use(express.json());
 
-        this.app.post("/signup", getSignupController(
-            this.container.getSignupService()
-        ));
+        this.app.post("/signup", getSignupController(this.container));
 
-        this.app.post("/login", getLoginController(
-            this.container.getValidateLoginService(),
-            this.config.jwtSecret
-        ));
+        this.app.post("/login", getLoginController(this.container, this.config.jwtSecret));
     }
 
     listen(port: number, cb?: () => void): Server {

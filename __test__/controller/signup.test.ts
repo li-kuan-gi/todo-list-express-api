@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ISignup } from "@auth/service";
-import { getSignupController } from "@controller/auth";
+import { SignupContainer, getSignupController } from "@controller/auth";
 
 let req: Request;
 let res: Response;
@@ -9,7 +9,8 @@ let controller: (req: Request, res: Response) => any;
 beforeEach(() => {
     req = {} as Request;
     res = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis() } as unknown as Response;
-    controller = getSignupController(new FakeSignup());
+    const container = { getSignupService: () => new FakeSignup() };
+    controller = getSignupController(container);
 });
 
 describe("signup", () => {

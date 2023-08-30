@@ -1,9 +1,14 @@
 import { ISignup, IValidateLogin, Signup, ValidateLogin } from "@auth/service";
 import { AuthRepoMongo, AuthViewMongo } from "@auth/storage";
+
+import { SignupContainer, ValidateLoginContainer } from "@controller/auth";
+
 import { MongoClientManager } from "./mongo-client-manager";
 import { ContainerConfig } from "./container-config";
 
-export class DependencyContainer {
+export class DependencyContainer implements
+    ValidateLoginContainer, SignupContainer {
+
     private manager: MongoClientManager;
     private config: ContainerConfig;
 
