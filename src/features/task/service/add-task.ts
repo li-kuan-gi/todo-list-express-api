@@ -31,6 +31,15 @@ export class AddTask {
     }
 }
 
+export interface IAddTask {
+    execute(
+        account: string,
+        project: string,
+        goal: string,
+        duration: number
+    ): Promise<string | AddTaskFailure>;
+}
+
 export enum AddTaskFailure {
     Duplicated, InvalidExpectDuration
 }

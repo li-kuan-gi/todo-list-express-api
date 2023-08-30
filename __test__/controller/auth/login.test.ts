@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { IValidateLogin } from "@auth/service";
-import { ValidateLoginContainer, getLoginController } from "@controller/auth";
+import { getLoginController } from "@controller/auth";
 
 let req: Request;
 let res: Response;

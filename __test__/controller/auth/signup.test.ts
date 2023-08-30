@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ISignup } from "@auth/service";
-import { SignupContainer, getSignupController } from "@controller/auth";
+import { getSignupController } from "@controller/auth";
 
 let req: Request;
 let res: Response;
