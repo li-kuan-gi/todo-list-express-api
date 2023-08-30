@@ -11,3 +11,7 @@ export class RemoveTask {
         await this.repo.remove(id);
     }
 }
+
+export interface IRemoveTask {
+    execute: (id: string) => Promise<void>;
+}
