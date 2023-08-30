@@ -1,14 +1,14 @@
 import { Db, MongoClient } from "mongodb";
 import { Server } from "http";
 import { App, AppConfig } from "@src/app";
-import { testConfig } from "./test-config";
+import { testApiPort, testConfig } from "./test-config";
 import { configureDB } from "./configure-db";
 
 let client: MongoClient;
 let db: Db;
 let server: Server;
 let config: AppConfig;
-let port: number = Number(process.env.TEST_API_PORT);
+let port: number = testApiPort;
 
 beforeAll(async () => {
     config = testConfig;

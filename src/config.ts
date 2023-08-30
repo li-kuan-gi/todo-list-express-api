@@ -7,3 +7,5 @@ export const config: AppConfig = {
     taskCollName: "task",
     jwtSecret: "jwt-secret-example"
 };
+
+export const apiPort = Number(process.env.API_PORT);
