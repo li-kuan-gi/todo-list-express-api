@@ -101,7 +101,7 @@ describe("task-modify service", () => {
         it("success if the duration is a positive number.", async () => {
             const duration = 2;
 
-            const result = await changeExpectDuration.execute(id, duration);
+            const result = await changeExpectDuration.execute(account, id, duration);
             const task = await repo.getTaskByID(id);
 
             expect(result).toBe(ChangeExpectDurationResult.Success);
@@ -112,12 +112,19 @@ describe("task-modify service", () => {
         it("fail if the duration is not a positive number.", async () => {
             const duration = 0;
 
-            const result = await changeExpectDuration.execute(id, duration);
+            const result = await changeExpectDuration.execute(account, id, duration);
             const task = await repo.getTaskByID(id);
 
             expect(result).toBe(ChangeExpectDurationResult.InvalidDuration);
             expect(repo.save).not.toBeCalled();
             expect(task.expectDuration).toBe(expectDuration);
+        });
+
+        it("throw if the account is not allowed for the task.", async () => {
+            const addTask = new AddTask(repo);
+
+            const changeExpectDuration = new ChangeExpectDuration(repo);
+            await expect(changeExpectDuration.execute("not allowed account", id, 1)).rejects.toThrow(NotAllowed);
         });
     });
 
