@@ -4,3 +4,4 @@ export { ChangeExpectDurationContainer, getChangeExpectDuration } from "./change
 export { StartTaskContainer, getStartTaskController } from "./start-task";
 export { StopTaskContainer, getStopTaskController } from "./stop-task";
 export { ResumeTaskContainer, getResumeTaskController } from "./resume-task";
+export { CompleteTaskContainer, getCompleteTaskController } from "./complete-tak";
