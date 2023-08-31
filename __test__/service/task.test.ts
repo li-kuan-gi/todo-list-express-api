@@ -12,9 +12,11 @@ import {
     StartTask,
     StopTask,
     ResumeTask,
-    CompleteTask
+    CompleteTask,
+    NotAllowed
 } from "@task/service";
 import { TestTaskStorage } from "./test-task-storage";
+import assert from "assert";
 
 let id: string;
 let account: string;
@@ -41,9 +43,11 @@ describe("add task", () => {
     });
 
     it("success if no same task.", async () => {
-        const result = await addTask.execute(account, project, goal, expectDuration);
+        const id = await addTask.execute(account, project, goal, expectDuration);
+        expect(typeof id).toBe("string");
 
-        expect(typeof result).toBe("string");
+        assert(typeof id === "string");
+        await expect(repo.getTaskByID(id)).resolves.not.toThrow();
     });
 
     it("fail if there is duplicated task.", async () => {
@@ -69,7 +73,15 @@ describe("remove task", () => {
         const id = await addTask.execute(account, project, goal, expectDuration) as string;
 
         const removeTask = new RemoveTask(repo);
-        expect(removeTask.execute(id)).resolves.toBe(undefined);
+        await expect(removeTask.execute(id, account)).resolves.toBe(undefined);
+    });
+
+    it("throw if the account is not allowed for the task.", async () => {
+        const addTask = new AddTask(repo);
+        const id = await addTask.execute(account, project, goal, expectDuration) as string;
+
+        const removeTask = new RemoveTask(repo);
+        await expect(removeTask.execute(id, "not allowed account")).rejects.toThrow(NotAllowed);
     });
 });
 

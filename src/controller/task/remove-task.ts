@@ -5,11 +5,12 @@ import { WrongFormat } from "..";
 
 export const getRemoveTaskController = (container: RemoveTaskContainer) =>
     async (req: Request, res: Response, next: NextFunction) => {
-        const { id } = req.body;
-        if (typeof id !== "string") return next(new WrongFormat());
+        const { id, account } = req.body;
+        if (!areValidType(id, account)) return next(new WrongFormat());
+
         try {
             const removeTask = container.getRemoveTask();
-            await removeTask.execute(id);
+            await removeTask.execute(id, account);
             return res.status(200);
         } catch (err) {
             next(err);
@@ -18,4 +19,8 @@ export const getRemoveTaskController = (container: RemoveTaskContainer) =>
 
 export interface RemoveTaskContainer {
     getRemoveTask: () => IRemoveTask;
+}
+
+export function areValidType(id: any, account: any): boolean {
+    return (typeof id === "string") && (typeof account === "string");
 }

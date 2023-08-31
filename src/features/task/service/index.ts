@@ -7,3 +7,4 @@ export * from "./resume-task";
 export * from "./start-task";
 export * from "./stop-task";
 export * from "./view";
+export * from "./not-allowed";
