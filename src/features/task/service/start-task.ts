@@ -1,14 +1,17 @@
+import { NotAllowed } from "./not-allowed";
 import { TaskRepository } from "./repository";
 
-export class StartTask {
+export class StartTask implements IStartTask {
     private readonly repo;
 
     constructor(repo: TaskRepository) {
         this.repo = repo;
     }
 
-    async execute(id: string, time: Date): Promise<StartTaskResult> {
+    async execute(account: string, id: string, time: Date): Promise<StartTaskResult> {
         const task = await this.repo.getTaskByID(id);
+
+        if (task.account !== account) throw new NotAllowed();
 
         const result = task.start(time);
 
@@ -19,6 +22,10 @@ export class StartTask {
             return StartTaskResult.HasStarted;
         }
     }
+}
+
+export interface IStartTask {
+    execute(account: string, id: string, time: Date): Promise<StartTaskResult>;
 }
 
 export enum StartTaskResult {

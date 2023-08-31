@@ -121,8 +121,6 @@ describe("task-modify service", () => {
         });
 
         it("throw if the account is not allowed for the task.", async () => {
-            const addTask = new AddTask(repo);
-
             const changeExpectDuration = new ChangeExpectDuration(repo);
             await expect(changeExpectDuration.execute("not allowed account", id, 1)).rejects.toThrow(NotAllowed);
         });
@@ -138,7 +136,7 @@ describe("task-modify service", () => {
         it("success if the task has not yet been started.", async () => {
             const time: Date = new Date();
 
-            const result = await startTask.execute(id, time);
+            const result = await startTask.execute(account, id, time);
 
             expect(result).toBe(StartTaskResult.Success);
             expect(repo.save).toBeCalledTimes(1);
@@ -146,12 +144,18 @@ describe("task-modify service", () => {
 
         it("fail if the task has been started.", async () => {
             const time: Date = new Date();
-            startTask.execute(id, time);
+            startTask.execute(account, id, time);
 
-            const result = await startTask.execute(id, time);
+            const result = await startTask.execute(account, id, time);
 
             expect(result).toBe(StartTaskResult.HasStarted);
             expect(repo.save).toBeCalledTimes(1);
+        });
+
+        it("throw if the account is not allowed for the task.", async () => {
+            const startTask = new StartTask(repo);
+            const time = new Date();
+            await expect(startTask.execute("not allowed account", id, time)).rejects.toThrow(NotAllowed);
         });
     });
 
@@ -168,7 +172,7 @@ describe("task-modify service", () => {
             const startTime = new Date();
             const stopTime = new Date(startTime.getTime() + 1);
 
-            await startTask.execute(id, startTime);
+            await startTask.execute(account, id, startTime);
             const result = await stopTask.execute(id, stopTime);
 
             expect(result).toBe(StopTaskResult.Success);
@@ -201,7 +205,7 @@ describe("task-modify service", () => {
             const stopTime = new Date(startTime.getTime() + 1);
             const resumeTime = new Date(startTime.getTime() + 2);
 
-            await startTask.execute(id, startTime);
+            await startTask.execute(account, id, startTime);
             await stopTask.execute(id, stopTime);
             const result = await resumeTask.execute(id, resumeTime);
 
@@ -213,7 +217,7 @@ describe("task-modify service", () => {
             const startTime = new Date();
             const resumeTime = new Date(startTime.getTime() + 2);
 
-            await startTask.execute(id, startTime);
+            await startTask.execute(account, id, startTime);
             const result = await resumeTask.execute(id, resumeTime);
 
             expect(result).toBe(ResumeTaskResult.NotStopped);
@@ -234,7 +238,7 @@ describe("task-modify service", () => {
             const startTime = new Date();
             const time = new Date(startTime.getTime() + 1);
 
-            await startTask.execute(id, startTime);
+            await startTask.execute(account, id, startTime);
             const result = await completeTask.execute(id, time);
 
             expect(result).toBe(CompleteTaskResult.Success);
