@@ -1,12 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 
 import { IRemoveTask } from "@task/service";
-import { WrongFormat } from "..";
+
+import { WrongFormat } from "@controller/wrong-format";
 
 export const getRemoveTaskController = (container: RemoveTaskContainer) =>
     async (req: Request, res: Response, next: NextFunction) => {
-        const { id, account } = req.body;
-        if (!areValidType(id, account)) return next(new WrongFormat());
+        const { id } = req.params;
+        const { account } = req.body;
+        if (!areValidType(account, id)) return next(new WrongFormat());
 
         try {
             const removeTask = container.getRemoveTask();
@@ -17,10 +19,10 @@ export const getRemoveTaskController = (container: RemoveTaskContainer) =>
         }
     };
 
-export interface RemoveTaskContainer {
-    getRemoveTask: () => IRemoveTask;
+export function areValidType(account: any, id: any): boolean {
+    return (typeof account === "string") && (typeof id === "string");
 }
 
-export function areValidType(id: any, account: any): boolean {
-    return (typeof id === "string") && (typeof account === "string");
+export interface RemoveTaskContainer {
+    getRemoveTask: () => IRemoveTask;
 }

@@ -14,8 +14,9 @@ describe("remove task controller", () => {
 
     beforeEach(() => {
         req = {
-            body: { id: "exist", account: "allowed" }
-        } as Request;
+            params: { id: "exist" },
+            body: { account: "allowed" }
+        } as unknown as Request;
 
         res = {
             status: jest.fn().mockReturnThis(),
@@ -34,30 +35,30 @@ describe("remove task controller", () => {
         expect(res.status).toBeCalledWith(200);
     });
 
-    it("forward a WrongFormat error if the format of request is invalid.", async () => {
-        req.body.id = 0;
+    it("forward a WrongFormat error if the format of data is wrong.", async () => {
+        delete req.params.id;
         await removeTask(req, res, next);
         expect(next).toBeCalledWith(expect.any(WrongFormat));
     });
 
     it("forward error if any occured.", async () => {
-        req.body.id = "not exist";
+        req.body.account = "not allowed";
         await removeTask(req, res, next);
         expect(next).toBeCalledWith(expect.any(Error));
     });
 });
 
-describe("\"areValidType\" function", () => {
+describe("\"areValidType\"", () => {
     it("return true if all types are valid.", () => {
-        expect(areValidType("id", "account")).toBeTruthy();
-    });
-
-    it("return false if id is not a string.", () => {
-        expect(areValidType(0, "account")).toBeFalsy();
+        expect(areValidType("acc", "id")).toBeTruthy();
     });
 
     it("return false if account is not a string.", () => {
-        expect(areValidType(0, "account")).toBeFalsy();
+        expect(areValidType(1, "id")).toBeFalsy();
+    });
+
+    it("return false if id is not a string.", () => {
+        expect(areValidType("acc", 0)).toBeFalsy();
     });
 });
 
