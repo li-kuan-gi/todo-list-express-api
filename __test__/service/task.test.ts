@@ -213,7 +213,7 @@ describe("task-modify service", () => {
 
             await startTask.execute(account, id, startTime);
             await stopTask.execute(account, id, stopTime);
-            const result = await resumeTask.execute(id, resumeTime);
+            const result = await resumeTask.execute(account, id, resumeTime);
 
             expect(result).toBe(ResumeTaskResult.Success);
             expect(repo.save).toBeCalledTimes(3);
@@ -224,10 +224,16 @@ describe("task-modify service", () => {
             const resumeTime = new Date(startTime.getTime() + 2);
 
             await startTask.execute(account, id, startTime);
-            const result = await resumeTask.execute(id, resumeTime);
+            const result = await resumeTask.execute(account, id, resumeTime);
 
             expect(result).toBe(ResumeTaskResult.NotStopped);
             expect(repo.save).toBeCalledTimes(1);
+        });
+
+        it("throw if the account is not allowed for the task.", async () => {
+            const resumeTask = new ResumeTask(repo);
+            const time = new Date();
+            await expect(resumeTask.execute("not allowed account", id, time)).rejects.toThrow(NotAllowed);
         });
     });
 
