@@ -1,7 +1,8 @@
 import express, { Express } from "express";
 import { Server } from "http";
 import { ContainerConfig, DependencyContainer } from "./container";
-import { getLoginController, getSignupController } from "./controller";
+import { getJwtValidateMiddleware, getLoginController, getSignupController } from "./controller";
+import { getTaskRouter } from "./task-router";
 
 export class App {
     private readonly config: AppConfig;
@@ -22,6 +23,8 @@ export class App {
         this.app.post("/signup", getSignupController(this.container));
 
         this.app.post("/login", getLoginController(this.container, this.config.jwtSecret));
+
+        this.app.use("/task", getJwtValidateMiddleware(this.config.jwtSecret), getTaskRouter(this.container));
     }
 
     listen(port: number, cb?: () => void): Server {

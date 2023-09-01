@@ -5,9 +5,12 @@ import { SignupContainer, ValidateLoginContainer } from "@controller/auth";
 
 import { MongoClientManager } from "./mongo-client-manager";
 import { ContainerConfig } from "./container-config";
+import { AddTaskContainer } from "@controller/task";
+import { AddTask, IAddTask } from "@task/service";
+import { TaskRepoMongo } from "@task/storage";
 
 export class DependencyContainer implements
-    ValidateLoginContainer, SignupContainer {
+    ValidateLoginContainer, SignupContainer, AddTaskContainer {
 
     private manager: MongoClientManager;
     private config: ContainerConfig;
@@ -32,4 +35,10 @@ export class DependencyContainer implements
         const view = new AuthViewMongo(db, this.config.userCollName);
         return new ValidateLogin(view);
     }
+
+    getAddTask(): IAddTask {
+        const db = this.manager.getMongoClient().db(this.config.dbName);
+        const repo = new TaskRepoMongo(db, this.config.taskCollName);
+        return new AddTask(repo);
+    };
 }

@@ -29,6 +29,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
     await db.dropCollection(config.userCollName);
+    await db.dropCollection(config.taskCollName);
     await db.dropDatabase();
     await client.close();
     server.close();
@@ -128,6 +129,32 @@ describe("login api", () => {
     });
 });
 
+describe("task", () => {
+    it("fail if something is wrong in token.", async () => {
+        const result = await postAddTask("pro", "goal", 1);
+        expect(result.status).toBe(400);
+    });
+
+    describe("normal flow", () => {
+        let token: string;
+
+        beforeEach(async () => {
+            const account = "acc";
+            const password = "pwd";
+            await postSignup(account, password);
+            const result = await postLogin(account, password);
+            token = (await result.json()).token;
+        });
+
+        it("case: add task.", async () => {
+            const result = await postAddTask("proj", "goal", 1, token);
+            expect(result.status).toBe(200);
+            const payload = await result.json();
+            expect(typeof payload.id).toBe("string");
+        });
+    });
+});
+
 function postSignup(account: string | undefined, password: string | undefined): Promise<Response> {
     const payload: { [k: string]: any; } = {};
     if (account !== undefined) payload["account"] = account;
@@ -152,6 +179,24 @@ function postLogin(account: string | undefined, password: string | undefined): P
         headers: {
             "Content-Type": "application/json"
         },
+        body: JSON.stringify(payload)
+    });
+}
+
+function postAddTask(
+    project: string,
+    goal: string,
+    expectDuration: number,
+    token?: string
+): Promise<Response> {
+    const payload = { project, goal, expectDuration };
+    const headers: { [k: string]: any; } = { "Content-Type": "application/json" };
+
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    return fetch(`http://localhost:${port}/task/add`, {
+        method: "POST",
+        headers,
         body: JSON.stringify(payload)
     });
 }
