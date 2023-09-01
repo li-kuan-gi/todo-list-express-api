@@ -20,7 +20,7 @@ export const getLoginController = (container: ValidateLoginContainer, jwtSecret:
             const result = await validate.execute(account, password);
 
             if (result) {
-                const token = jwt.sign({ account }, jwtSecret, { expiresIn: '1m' });
+                const token = jwt.sign({ account }, jwtSecret, { expiresIn: '1h' });
                 return res.status(200).json({ token });
             } else {
                 return res.status(401).json({ msg: "account or password is incorrect." });
