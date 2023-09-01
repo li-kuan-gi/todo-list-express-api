@@ -13,7 +13,7 @@ export const getRemoveTaskController = (container: RemoveTaskContainer) =>
         try {
             const removeTask = container.getRemoveTask();
             await removeTask.execute(id, account);
-            return res.status(200);
+            return res.status(200).json();
         } catch (err) {
             next(err);
         }

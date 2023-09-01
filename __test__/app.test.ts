@@ -137,6 +137,7 @@ describe("task", () => {
 
     describe("normal flow", () => {
         let token: string;
+        let id: string;
 
         beforeEach(async () => {
             const account = "acc";
@@ -144,13 +145,23 @@ describe("task", () => {
             await postSignup(account, password);
             const result = await postLogin(account, password);
             token = (await result.json()).token;
+            id = (await (await postAddTask("proj", "goal", 1, token)).json()).id;
+        });
+
+        afterEach(async () => {
+            await db.collection(config.taskCollName).deleteMany({});
         });
 
         it("case: add task.", async () => {
-            const result = await postAddTask("proj", "goal", 1, token);
+            const result = await postAddTask("test", "test", 1, token);
             expect(result.status).toBe(200);
             const payload = await result.json();
             expect(typeof payload.id).toBe("string");
+        });
+
+        it("case: remove task", async () => {
+            const result = await postRemoveTask(id, token);
+            expect(result.status).toBe(200);
         });
     });
 });
@@ -192,12 +203,21 @@ function postAddTask(
     const payload = { project, goal, expectDuration };
     const headers: { [k: string]: any; } = { "Content-Type": "application/json" };
 
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+    if (token) headers.Authorization = `Bearer ${token}`;
 
     return fetch(`http://localhost:${port}/task/add`, {
         method: "POST",
         headers,
         body: JSON.stringify(payload)
+    });
+}
+
+function postRemoveTask(id: string, token: string): Promise<Response> {
+    return fetch(`http://localhost:${port}/task/remove/${id}`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
     });
 }
 
