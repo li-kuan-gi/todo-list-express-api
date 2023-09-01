@@ -35,12 +35,14 @@ describe("change expect duration controller", () => {
     it("return 200 if the change success.", async () => {
         await change(req, res, next);
         expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalled();
     });
 
     it("return status 422 if the duration is invalid.", async () => {
         req.body.duration = 0;
         await change(req, res, next);
         expect(res.status).toBeCalledWith(422);
+        expect(res.json).toBeCalled();
     });
 
     it("forward WrongFormat error if the format of data is wrong.", async () => {

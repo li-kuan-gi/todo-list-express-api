@@ -15,9 +15,9 @@ export const getChangeExpectDuration = (container: ChangeExpectDurationContainer
             const change = container.getChangeExpectDuration();
             const result = await change.execute(account, id, duration);
             if (result === ChangeExpectDurationResult.Success) {
-                return res.status(200);
+                return res.status(200).json({});
             } else {
-                return res.status(422);
+                return res.status(422).json({});
             }
         } catch (error) {
             return next(error);

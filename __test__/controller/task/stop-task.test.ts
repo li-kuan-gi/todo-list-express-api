@@ -30,6 +30,7 @@ describe("stop task controller", () => {
     it("return status 200 if stop success.", async () => {
         await stop(req, res, next);
         expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalled();
     });
 
     it("return status 422 if the stop fail", async () => {
@@ -40,6 +41,7 @@ describe("stop task controller", () => {
         await stop(req, res, next);
 
         expect(res.status).toBeCalledWith(422);
+        expect(res.json).toBeCalled();
     });
 
     it("forward WrongFormat error if the format of data is wrong.", async () => {

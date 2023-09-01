@@ -17,7 +17,7 @@ export const getStopTaskController = (container: StopTaskContainer) =>
         try {
             const stop = container.getStopTask();
             const result = await stop.execute(account, id, time);
-            return result === StopTaskResult.Success ? res.status(200) : res.status(422);
+            return result === StopTaskResult.Success ? res.status(200).json({}) : res.status(422).json({});
         } catch (error) {
             next(error);
         }

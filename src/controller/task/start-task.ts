@@ -17,7 +17,7 @@ export const getStartTaskController = (container: StartTaskContainer) =>
         const start = container.getStartTask();
         try {
             const result = await start.execute(account, id, time);
-            return result === StartTaskResult.Success ? res.status(200) : res.status(422);
+            return result === StartTaskResult.Success ? res.status(200).json({}) : res.status(422).json({});
         } catch (error) {
             next(error);
         }

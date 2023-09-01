@@ -32,6 +32,7 @@ describe("complete task controller", () => {
     it("return status 200 if complete success.", async () => {
         await complete(req, res, next);
         expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalled();
     });
 
     it("return status 422 if the complete fail", async () => {
@@ -42,6 +43,7 @@ describe("complete task controller", () => {
         await complete(req, res, next);
 
         expect(res.status).toBeCalledWith(422);
+        expect(res.json).toBeCalled();
     });
 
     it("forward WrongFormat error if the format of data is wrong.", async () => {

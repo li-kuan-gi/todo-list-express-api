@@ -17,7 +17,7 @@ export const getResumeTaskController = (container: ResumeTaskContainer) =>
         try {
             const resume = container.getResumeTask();
             const result = await resume.execute(account, id, time);
-            return result === ResumeTaskResult.Success ? res.status(200) : res.status(422);
+            return result === ResumeTaskResult.Success ? res.status(200).json({}) : res.status(422).json({});
         } catch (error) {
             next(error);
         }

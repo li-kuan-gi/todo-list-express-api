@@ -34,6 +34,7 @@ describe("start task controller", () => {
     it("return status 200 if the start success.", async () => {
         await start(req, res, next);
         expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalled();
     });
 
     it("return status 422 if the task has started.", async () => {
@@ -41,6 +42,7 @@ describe("start task controller", () => {
         req.body.time = new Date(now.getTime() + 1000 * 1000).toISOString();
         await start(req, res, next);
         expect(res.status).toBeCalledWith(422);
+        expect(res.json).toBeCalled();
     });
 
     it("forward WrongFormat error if the format of data is wrong.", async () => {

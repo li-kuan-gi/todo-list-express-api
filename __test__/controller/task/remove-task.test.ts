@@ -33,6 +33,7 @@ describe("remove task controller", () => {
         await removeTask(req, res, next);
 
         expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalled();
     });
 
     it("forward a WrongFormat error if the format of data is wrong.", async () => {
