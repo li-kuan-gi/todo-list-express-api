@@ -4,7 +4,7 @@ import { ChangeExpectDurationResult, IChangeExpectDuration } from "@task/service
 
 import { WrongFormat } from "@controller/wrong-format";
 
-export const getChangeExpectDuration = (container: ChangeExpectDurationContainer) =>
+export const getChangeExpectDurationController = (container: ChangeExpectDurationContainer) =>
     async (req: Request, res: Response, next: NextFunction) => {
         const { id } = req.params;
         const { account, duration } = req.body;

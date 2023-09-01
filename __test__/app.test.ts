@@ -159,9 +159,39 @@ describe("task", () => {
             expect(typeof payload.id).toBe("string");
         });
 
-        it("case: remove task", async () => {
+        it("case: remove task.", async () => {
             const result = await postRemoveTask(id, token);
             expect(result.status).toBe(200);
+        });
+
+        it("case: change expect duration.", async () => {
+            const duration = 7;
+            const result = await postChangeDuration(id, duration, token);
+            expect(result.status).toBe(200);
+        });
+
+        it("case: start task.", async () => {
+            const time = new Date();
+            const result = await postTaskOp("start", id, time, token);
+            expect(result.status).toBe(200);
+        });
+
+        it("case: stop task.", async () => {
+            const time = new Date();
+            const result = await postTaskOp("stop", id, time, token);
+            expect(result.status).toBe(422);
+        });
+
+        it("case: resume task.", async () => {
+            const time = new Date();
+            const result = await postTaskOp("resume", id, time, token);
+            expect(result.status).toBe(422);
+        });
+
+        it("case: complete task.", async () => {
+            const time = new Date();
+            const result = await postTaskOp("complete", id, time, token);
+            expect(result.status).toBe(422);
         });
     });
 });
@@ -218,6 +248,30 @@ function postRemoveTask(id: string, token: string): Promise<Response> {
         headers: {
             Authorization: `Bearer ${token}`
         }
+    });
+}
+
+function postChangeDuration(id: string, duration: number, token: string): Promise<Response> {
+    const payload = { duration };
+    return fetch(`http://localhost:${port}/task/change-duration/${id}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+    });
+}
+
+function postTaskOp(op: string, id: string, time: Date, token: string): Promise<Response> {
+    const payload = { time: time.toISOString() };
+    return fetch(`http://localhost:${port}/task/${op}/${id}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
     });
 }
 

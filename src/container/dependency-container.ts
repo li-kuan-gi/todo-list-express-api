@@ -5,15 +5,20 @@ import { SignupContainer, ValidateLoginContainer } from "@controller/auth";
 
 import { MongoClientManager } from "./mongo-client-manager";
 import { ContainerConfig } from "./container-config";
-import { AddTaskContainer, RemoveTaskContainer } from "@controller/task";
-import { AddTask, IAddTask, IRemoveTask, RemoveTask } from "@task/service";
+import { AddTaskContainer, ChangeExpectDurationContainer, CompleteTaskContainer, RemoveTaskContainer, ResumeTaskContainer, StartTaskContainer, StopTaskContainer } from "@controller/task";
+import { AddTask, ChangeExpectDuration, CompleteTask, IAddTask, IChangeExpectDuration, ICompleteTask, IRemoveTask, IResumeTask, IStartTask, IStopTask, RemoveTask, ResumeTask, StartTask, StopTask } from "@task/service";
 import { TaskRepoMongo } from "@task/storage";
 
 export class DependencyContainer implements
     ValidateLoginContainer,
     SignupContainer,
     AddTaskContainer,
-    RemoveTaskContainer {
+    RemoveTaskContainer,
+    ChangeExpectDurationContainer,
+    StartTaskContainer,
+    StopTaskContainer,
+    ResumeTaskContainer,
+    CompleteTaskContainer {
 
     private manager: MongoClientManager;
     private config: ContainerConfig;
@@ -49,5 +54,35 @@ export class DependencyContainer implements
         const db = this.manager.getMongoClient().db(this.config.dbName);
         const repo = new TaskRepoMongo(db, this.config.taskCollName);
         return new RemoveTask(repo);
+    };
+
+    getChangeExpectDuration(): IChangeExpectDuration {
+        const db = this.manager.getMongoClient().db(this.config.dbName);
+        const repo = new TaskRepoMongo(db, this.config.taskCollName);
+        return new ChangeExpectDuration(repo);
+    }
+
+    getStartTask(): IStartTask {
+        const db = this.manager.getMongoClient().db(this.config.dbName);
+        const repo = new TaskRepoMongo(db, this.config.taskCollName);
+        return new StartTask(repo);
+    };
+
+    getStopTask(): IStopTask {
+        const db = this.manager.getMongoClient().db(this.config.dbName);
+        const repo = new TaskRepoMongo(db, this.config.taskCollName);
+        return new StopTask(repo);
+    };
+
+    getResumeTask(): IResumeTask {
+        const db = this.manager.getMongoClient().db(this.config.dbName);
+        const repo = new TaskRepoMongo(db, this.config.taskCollName);
+        return new ResumeTask(repo);
+    };
+
+    getCompleteTask(): ICompleteTask {
+        const db = this.manager.getMongoClient().db(this.config.dbName);
+        const repo = new TaskRepoMongo(db, this.config.taskCollName);
+        return new CompleteTask(repo);
     };
 }
