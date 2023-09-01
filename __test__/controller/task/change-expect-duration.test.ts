@@ -3,8 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { ChangeExpectDurationResult, IChangeExpectDuration } from "@task/service";
 
 import { WrongFormat } from "@controller/wrong-format";
-import { getChangeExpectDuration } from "@controller/task";
-import { areValidType } from "@controller/task/change-expect-duration";
+import { areValidType, getChangeExpectDurationController } from "@controller/task/change-expect-duration";
 
 describe("change expect duration controller", () => {
     let req: Request;
@@ -29,7 +28,7 @@ describe("change expect duration controller", () => {
         next = jest.fn();
 
         const container = { getChangeExpectDuration: () => new FakeChangeExpectDuration() };
-        change = getChangeExpectDuration(container);
+        change = getChangeExpectDurationController(container);
     });
 
     it("return 200 if the change success.", async () => {

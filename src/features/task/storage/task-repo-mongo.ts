@@ -11,7 +11,13 @@ export class TaskRepoMongo implements TaskRepository {
     }
 
     async getTaskByID(id: string): Promise<Task> {
-        const taskData = await this.coll.findOne({ _id: new ObjectId(id) });
+        let _id: ObjectId;
+        try {
+            _id = new ObjectId(id);
+        } catch (_) {
+            throw new TaskNotFound();
+        }
+        const taskData = await this.coll.findOne({ _id });
 
         if (!taskData) throw new TaskNotFound();
 
@@ -53,7 +59,13 @@ export class TaskRepoMongo implements TaskRepository {
     }
 
     async remove(id: string): Promise<void> {
-        const result = await this.coll.deleteOne({ _id: new ObjectId(id) });
+        let _id: ObjectId;
+        try {
+            _id = new ObjectId(id);
+        } catch (_) {
+            throw new TaskNotFound();
+        }
+        const result = await this.coll.deleteOne({ _id });
         if (result.deletedCount === 0) {
             throw new TaskNotFound();
         }

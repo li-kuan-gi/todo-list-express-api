@@ -62,7 +62,7 @@ describe("task repo", () => {
         });
 
         it("fail if the task not exists.", async () => {
-            expect(repo.remove("123456789123456789123456")).rejects.toBeInstanceOf(TaskNotFound);
+            expect(repo.remove("wrong id")).rejects.toBeInstanceOf(TaskNotFound);
         });
     });
 

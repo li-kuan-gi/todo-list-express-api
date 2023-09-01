@@ -1,7 +1,7 @@
-import express, { Express } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import { Server } from "http";
 import { ContainerConfig, DependencyContainer } from "./container";
-import { getJwtValidateMiddleware, getLoginController, getSignupController } from "./controller";
+import { errorController, getJwtValidateMiddleware, getLoginController, getSignupController } from "./controller";
 import { getTaskRouter } from "./task-router";
 
 export class App {
@@ -25,6 +25,12 @@ export class App {
         this.app.post("/login", getLoginController(this.container, this.config.jwtSecret));
 
         this.app.use("/task", getJwtValidateMiddleware(this.config.jwtSecret), getTaskRouter(this.container));
+
+        this.app.use(errorController);
+
+        this.app.use((err: Error, req: Request, res: Response, next: NextFunction): any => {
+            res.status(500).json({});
+        });
     }
 
     listen(port: number, cb?: () => void): Server {

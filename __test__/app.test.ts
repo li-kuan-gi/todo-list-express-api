@@ -196,6 +196,20 @@ describe("task", () => {
     });
 });
 
+describe("error controller for task", () => {
+    it("task-related errors are handled by controller.", async () => {
+        const account = "acc";
+        const password = "pwd";
+        await postSignup(account, password);
+        const token = (await (await postLogin(account, password)).json()).token;
+
+        const result = await postRemoveTask("wrong", token);
+
+        expect(result.status).toBe(400);
+        expect(await result.json()).toMatchObject({ msg: expect.stringContaining("found") });
+    });
+});
+
 function postSignup(account: string | undefined, password: string | undefined): Promise<Response> {
     const payload: { [k: string]: any; } = {};
     if (account !== undefined) payload["account"] = account;
